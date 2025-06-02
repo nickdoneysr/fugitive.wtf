@@ -1,0 +1,3139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Fugitive Chess</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Permanent+Marker&family=Exo+2&family=Cabin&family=Bubblegum+Sans&family=VCR+OSD+Mono&family=Bebas+Neue&family=Rajdhani&family=Press+Start+2P&family=MedievalSharp&family=Audiowide&family=Creepster&family=Hanalei+Fill&family=Nosifer&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            z-index: 1;
+            position: relative;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 15px;
+            padding-bottom: 100px;
+            transition: background 0.3s, color 0.3s;
+        }
+        h1 { font-size: 48px; margin: 10px 0; text-align: center; }
+        h2 { font-size: 24px; margin: 7px 0; text-align: center; }
+        h3 { font-size: 21px; margin: 5px 0; text-align: center; }
+        f1 { font-size: 32px; margin: 10px 0; text-align: center; }
+        f2 { font-size: 16px; margin: 7px 0; text-align: center; }
+        f3 { font-size: 14px; margin: 5px 0; text-align: center; }
+        #start-page, #fugitive-menu, #game-area, #creative-mode, #tutorial-section, #settings-section, #rules-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        #start-page { display: flex; } /* Initially visible */
+        #ad-board-container {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(8, 50px);
+        }
+        .square {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .text {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .text-white { color: white; }
+        .bg-red { background-color: red; }
+        .bg-blue { background-color: blue; }
+        .bg-green { background-color: green; }
+        .bg-yellow { background-color: yellow; }
+        .bg-purple { background-color: purple; }
+        .bg-orange { background-color: orange; }
+        select {
+            padding: 5px;
+            font-size: 14px;
+            margin: 5px 0;
+            border-radius: 3px;
+            width: 200px;
+            background: #fff;
+            border: 1px solid #333;
+            cursor: pointer;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            margin: 3px;
+            transition: background 0.3s;
+        }
+        button:hover { background: #45a049; }
+        button:focus {
+            outline: 2px solid #000;
+            outline-offset: 2px;
+        }
+        select:focus {
+            outline: 2px solid #000;
+            outline-offset: 2px;
+        }
+        canvas {
+            border: 2px solid #000;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            display: none; /* Hide by default */
+        }
+        #level-info, #game-info, #stats, #track-info, #mode-instructions, #tutorial-info {
+            margin: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+        #mode-instructions { max-width: 350px; }
+        #prompt {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 10px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+            z-index: 1000;
+            max-width: 350px;
+        }
+        #music-controls button {
+            padding: 6px 8px;
+            font-size: 12px;
+            margin: 0 3px;
+            min-width: 55px;
+            color: white;
+            border: 1px solid #333;
+        }
+        #game-area button, #creative-mode button, #tutorial-section button {
+            display: inline-block;
+        }
+        footer {
+            position: relative;
+            flex-direction: column;
+            height: auto;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #f0f0f0;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            padding-top: 20px;
+            z-index: 10;
+            transition: background 0.3s, color 0.3s;
+        }
+        #developer-info, #logo-placeholder, #sponsor-banner {
+            margin: 5px 20px;
+        }
+        #music-player {
+            display: flex;
+            align-items: center;
+        }
+        #track-info { margin-right: 10px; }
+        #music-controls {
+            display: flex;
+            justify-content: center;
+            margin: 0 10px;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+        }
+        #sponsor-banner {
+            background: #eee;
+            padding: 5px;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-style: italic;
+        }
+        @media (max-width: 600px) {
+            body { padding-bottom: 100px; }
+            #game-footer {
+                flex-direction: column;
+                padding: 5px;
+            }
+            #music-player { margin: 5px 0; }
+        }
+        #rules-content {
+            max-width: 600px;
+            text-align: left;
+            padding: 10px;
+        }
+        #standard-chess-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Fugitive</h1>
+        <h2>The King's Gambit</h2>
+        <h3>Escape to Reclaim Your Throne</h3>
+    </header>
+    <main>
+        <!-- Start Page -->
+        <div id="start-page">
+            <div id="ad-board-container"></div>
+            <button id="btn-to-fugitive" aria-label="Go to Fugitive mode">Fugitive</button>
+            <button id="btn-to-standard" aria-label="Go to Standard Chess mode">Standard Chess</button>
+            <button id="btn-to-creative" aria-label="Go to Creative mode">Creative Mode</button>
+            <button id="btn-to-tutorial" aria-label="Go to Tutorial">Tutorial</button>
+            <button id="btn-to-settings" aria-label="Go to Settings">Settings</button>
+            <button id="btn-to-rules" aria-label="Go to Rules">Rules</button>
+        </div>
+
+        <!-- Fugitive Menu -->
+        <div id="fugitive-menu">
+            <h3>Fugitive Mode</h3>
+            <div>Difficulty</div>
+            <select id="difficulty" title="Choose game difficulty. Higher levels increase guard numbers and aggression.">
+                <option value="pawn">Pawn</option>
+                <option value="knight" selected>Knight</option>
+                <option value="rook">Rook</option>
+                <option value="bishop">Bishop</option>
+                <option value="queen">Queen</option>
+                <option value="king">King</option>
+            </select>
+            <div id="level-info">Level 1</div>
+            <select id="level" title="Select the level (1-100). Affects guard types and numbers."></select>
+            <div>Theme</div>
+            <select id="theme" title="Choose the visual theme of the game board and UI.">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="greyscale">Greyscale</option>
+                <option value="rgb">RGB</option>
+                <option value="90s">90s</option>
+                <option value="80s">80s</option>
+                <option value="70s">70s</option>
+                <option value="neon">Neon</option>
+                <option value="paint">Paint</option>
+                <option value="galaxy">Galaxy</option>
+                <option value="pirate">Pirate</option>
+                <option value="cyberpunk">Cyberpunk</option>
+                <option value="retro-arcade">Retro Arcade</option>
+                <option value="nature">Nature</option>
+                <option value="steampunk">Steampunk</option>
+                <option value="mythology">Mythology</option>
+                <option value="underwater">Underwater</option>
+                <option value="desert">Desert</option>
+                <option value="jungle">Jungle</option>
+                <option value="space">Space</option>
+                <option value="ice">Ice</option>
+                <option value="volcano">Volcano</option>
+                <option value="candy">Candy Land</option>
+                <option value="haunted">Haunted</option>
+                <option value="circus">Circus</option>
+                <option value="dream">Dreamscape</option>
+                <option value="noir">Noir</option>
+            </select>
+            <div>Piece Style</div>
+            <select id="piece-style" title="Select the style of game pieces (e.g., classic, emoji).">
+                <option value="classic">Classic</option>
+                <option value="emoji">Emoji</option>
+                <option value="minimalist">Minimalist</option>
+                <option value="fantasy">Fantasy</option>
+                <option value="scifi">Sci-Fi</option>
+                <option value="historical">Historical</option>
+                <option value="medieval">Medieval</option>
+                <option value="futuristic">Futuristic</option>
+                <option value="animal-kingdom">Animal Kingdom</option>
+                <option value="pirate-crew">Pirate Crew</option>
+                <option value="cybernetic">Cybernetic</option>
+                <option value="mythic">Mythic</option>
+                <option value="circus-troupe">Circus Troupe</option>
+                <option value="steampunk-gadgets">Steampunk Gadgets</option>
+                <option value="elemental">Elemental</option>
+                <option value="ghostly">Ghostly</option>
+                <option value="candy-cast">Candy Cast</option>
+                <option value="catholic">Catholic</option>
+            </select>
+            <div>Hero</div>
+            <select id="hero-select" title="Choose a hero with a special ability (optional)."></select>
+            <div>
+                <label for="song-select">Select Song:</label>
+                <select id="song-select" title="Choose background music for the game.">
+                    <option value="">Select a song</option>
+                </select>
+            </div>
+            <div>Turn Timer</div>
+            <select id="turn-timer" title="Enable a 30-second timer per turn when On.">
+                <option value="off">Off</option>
+                <option value="on">On</option>
+            </select>
+            <div>Turn Limit</div>
+            <select id="turn-limit" title="Set a maximum number of turns (None, 5, 10, 15).">
+                <option value="none">None</option>
+                <option value=" monitoring">5 Turns</option>
+                <option value="10">10 Turns</option>
+                <option value="15">15 Turns</option>
+            </select>
+            <div>King Disarmed</div>
+            <select id="king-disarmed" title="Prevent the king from attacking guards when On.">
+                <option value="off">Off</option>
+                <option value="on">On</option>
+            </select>
+            <div>Guards</div>
+            <select id="guards" title="Enable or disable guards on the board.">
+                <option value="on">On</option>
+                <option value="off">Off</option>
+            </select>
+            <div>Fog Vision</div>
+            <select id="fog-vision" title="Limit visibility to the king’s adjacent squares when On.">
+                <option value="off">Off</option>
+                <option value="on">On</option>
+            </select>
+            <div>Treasure Drops</div>
+            <select id="treasure-drops" title="Enable random treasure drops on the board when On.">
+                <option value="off">Off</option>
+                <option value="on">On</option>
+            </select>
+            <div>Hidden Items</div>
+            <select id="hidden-items" title="Make treasures invisible until collected when On.">
+                <option value="off">Off</option>
+                <option value="on">On</option>
+            </select>
+            <div>Arcade Mode</div>
+            <select id="arcade-mode" title="Enable point collection and scoring when On.">
+                <option value="off">Off</option>
+                <option value="on">On</option>
+            </select>
+            <div>Hero Ability</div>
+            <select id="hero-ability" title="Enable the selected hero’s special ability when On.">
+                <option value="off">Off</option>
+                <option value="on">On</option>
+            </select>
+            <div>Portals</div>
+            <select id="portals" title="Add 0-3 pairs of teleporting portals to the board.">
+                <option value="0">Off</option>
+                <option value="1">1 Pair</option>
+                <option value="2">2 Pairs</option>
+                <option value="3⁠">3 Pairs</option>
+            </select>
+            <button id="btn-random-theme" aria-label="Set a random theme">Random Theme</button>
+            <button id="btn-play" aria-label="Start the game with selected settings">Play</button>
+            <button id="btn-random-start" aria-label="Start a game with random settings">Random Start</button>
+            <button id="btn-back-to-start-fugitive" aria-label="Return to the start page">Back to Start Page</button>
+        </div>
+
+        <!-- Game Area (Fugitive Gameplay) -->
+        <div id="game-area">
+            <div id="mode-instructions"></div>
+            <div id="game-info">Roll Dice to Start</div>
+            <canvas id="board" width="400" height="400"></canvas>
+            <div id="stats">Difficulty: Knight | Rolls: 0 | Moves: 0 | Guards: 0 | Levels: 0</div>
+            <div>
+                <button id="btn-roll" aria-label="Roll the dice to start your turn">Roll Dice</button>
+                <button id="btn-menu" aria-label="Return to Fugitive menu">Fugitive Menu</button>
+                <button id="btn-reset" aria-label="Reset the current level">Reset</button>
+                <button id="btn-restart" aria-label="Restart the current level">Restart</button>
+                <button id="btn-save" aria-label="Save the current game state">Save Game</button>
+                <button id="btn-load" aria-label="Load a saved game">Load Game</button>
+                <button id="btn-back-to-start-game" aria-label="Return to the start page">Back to Start Page</button>
+            </div>
+        </div>
+
+        <!-- Standard Mode -->
+        <div id="standard-chess-section">
+            <h3>Standard Chess</h3>
+            <div>Difficulty</div>
+            <select id="standard-difficulty" title="Choose AI difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <div>Theme</div>
+            <select id="standard-theme" title="Choose the visual theme of the game board and UI">
+                <!-- Options will be populated dynamically from existing themes -->
+            </select>
+            <div>Piece Style</div>
+            <select id="standard-piece-style" title="Select the style of game pieces">
+                <!-- Options will be populated dynamically from existing piece styles -->
+            </select>
+            <div>Hero</div>
+            <select id="standard-hero-select" title="Choose a hero to replace the king visually">
+                <option value="-1">None Selected</option>
+                <!-- Options will be populated dynamically -->
+            </select>
+            <div>
+                <label for="standard-song-select">Select Song:</label>
+                <select id="standard-song-select" title="Choose background music for the game">
+                    <option value="">Select a song</option>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+            <div>Turn Timer</div>
+            <select id="standard-turn-timer" title="Enable a 30-second timer per turn when On">
+                <option value="off">Off</option>
+                <option value="on">On</option>
+            </select>
+            <button id="btn-standard-random-theme" aria-label="Set a random theme">Random Theme</button>
+            <button id="btn-standard-play" aria-label="Start Standard Chess">Play</button>
+            <button id="btn-standard-reset" aria-label="Reset the game">Reset</button> <!-- Added Reset Button -->
+            <button id="btn-back-to-start-standard" aria-label="Return to the start page">Back to Start Page</button>
+            <div id="standard-game-info">White to move</div>
+            <canvas id="standard-chess-board" width="400" height="400"></canvas>
+        </div>
+
+        <!-- Creative Mode -->
+        <div id="creative-mode">
+            <h3>Creative Mode</h3>
+            <div id="creative-tools">
+                <button id="btn-place-king" aria-label="Place the king on the board">Place King</button>
+                <button id="btn-place-jail" aria-label="Place the jail on the board">Place Jail</button>
+                <button id="btn-place-escape" aria-label="Place the escape point on the board">Place Escape</button>
+                <select id="guard-type" title="Choose guard type to place.">
+                    <option value="pawn">Pawn</option>
+                    <option value="rook">Rook</option>
+                    <option value="knight">Knight</option>
+                    <option value="bishop">Bishop</option>
+                    <option value="queen">Queen</option>
+                </select>
+                <button id="btn-place-guard" aria-label="Place a guard on the board">Place Guard</button>
+                <button id="btn-place-block" aria-label="Place a block on the board">Place Block</button>
+                <select id="treasure-type" title="Choose treasure type to place.">
+                    <option value="diamond">Diamond</option>
+                    <option value="key">Key</option>
+                    <option value="gold">Gold</option>
+                    <option value="shield">Shield</option>
+                    <option value="sword">Sword</option>
+                    <option value="boots">Boots</option>
+                    <option value="spyglass">Spyglass</option>
+                    <option value="portal">Portal</option>
+                    <option value="potion">Potion</option>
+                    <option value="map">Map</option>
+                    <option value="trident">Trident</option>
+                    <option value="excalibur">Excalibur</option>
+                    <option value="mjolnir">Mjolnir</option>
+                    <option value="grail">Grail</option>
+                    <option value="horn">Horn</option>
+                    <option value="bow">Bow</option>
+                    <option value="crown">Crown</option>
+                    <option value="feather">Feather</option>
+                    <option value="eye">Eye</option>
+                    <option value="storm">Storm</option>
+                </select>
+                <button id="btn-place-treasure" aria-label="Place a treasure on the board">Place Treasure</button>
+                <button id="btn-place-portal" aria-label="Place a portal on the board">Place Portal</button>
+                <button id="btn-remove" aria-label="Remove an element from the board">Remove Element</button>
+                <button id="btn-save-map" aria-label="Save the current map">Save Map</button>
+                <button id="btn-load-map" aria-label="Load a saved map">Load Map</button>
+                <button id="btn-play-creative" aria-label="Play the current map">Play Map</button>
+                <button id="btn-back-to-start-creative" aria-label="Return to the start page">Back to Start Page</button>
+            </div>
+            <canvas id="creative-board" width="400" height="400"></canvas>
+        </div>
+
+        <!-- Tutorial Section -->
+        <div id="tutorial-section">
+            <h3>Tutorial</h3>
+            <div id="tutorial-info">Welcome to the Tutorial! Follow the instructions below.</div>
+            <canvas id="tutorial-board" width="400" height="400"></canvas>
+            <button id="btn-back-to-start-tutorial" aria-label="Return to the start page">Back to Start Page</button>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings-section">
+            <h3>Settings</h3>
+            <label for="music-volume">Music Volume:</label>
+            <input type="range" id="music-volume" min="0" max="1" step="0.1" value="0.5">
+            <button id="btn-save-theme" aria-label="Save the current theme">Save Current Theme</button>
+            <button id="btn-back-to-start-settings" aria-label="Return to the start page">Back to Start Page</button>
+        </div>
+
+        <!-- Rules Section -->
+        <div id="rules-section">
+            <h3>Game Rules</h3>
+            <div id="rules-content">
+                <p><strong>Goal:</strong> Escape from jail (red square) to the safe spot (green square) as the king or a selected hero, avoiding guards.</p>
+                <p><strong>Play:</strong></p>
+                <ul>
+                    <li>Choose difficulty, level, theme, piece style, and optionally a hero.</li>
+                    <li>Toggle options: Turn Timer, Turn Limit, King Disarmed, Guards, Treasure Drops, Hidden Items, Hero Ability.</li>
+                    <li>Click Play or Random Start.</li>
+                    <li>Black walls block paths.</li>
+                    <li>Press Space to roll dice (1–6 moves). Use arrow keys or WASD to move.</li>
+                    <li>Move (1 move per square) or attack guards (1 move, removes them, ends turn, unless King Disarmed).</li>
+                    <li>Collect treasures for special abilities (if enabled).</li>
+                    <li>Use hero abilities (if enabled).</li>
+                    <li>Reset: new board; Restart: same board; Menu: return to menu.</li>
+                </ul>
+                <p><strong>Pieces:</strong></p>
+                <ul>
+                    <li><strong>King/Hero:</strong> Moves one square in any direction.</li>
+                    <li><strong>Pawn:</strong> Moves diagonally towards you.</li>
+                    <li><strong>Rook:</strong> Moves horizontally or vertically towards you.</li>
+                    <li><strong>Knight:</strong> Moves in an L-shape.</li>
+                    <li><strong>Bishop:</strong> Moves diagonally towards you.</li>
+                    <li><strong>Queen:</strong> Moves in any direction towards you.</li>
+                </ul>
+                <p><strong>Options:</strong></p>
+                <ul>
+                    <li><strong>Turn Timer:</strong> Limits time per turn to 30s when On.</li>
+                    <li><strong>Turn Limit:</strong> Ends game if exceeded (None, 5, 10, 15 turns).</li>
+                    <li><strong>King Disarmed:</strong> Prevents attacking guards when On.</li>
+                    <li><strong>Guards:</strong> Enables/disables guards.</li>
+                    <li><strong>Treasure Drops:</strong> Enables random treasure items on the board.</li>
+                    <li><strong>Hidden Items:</strong> Makes treasure items invisible until collected.</li>
+                    <li><strong>Hero Ability:</strong> Allows the selected hero to use their special ability.</li>
+                    <li><strong>Portals:</strong> Adds 0 to 3 pairs of linked portals on the board.</li>
+                    <li><strong>Arcade Mode:</strong> Point items (①, ⑤, ⑩) drop, awarding 1, 5, or 10 points. Killing a guard awards 10 points.</li>
+                </ul>
+            </div>
+            <button id="btn-back-to-start-rules" aria-label="Return to the start page">Back to Start Page</button>
+        </div>
+
+        <!-- Prompt (Shared Across Modes) -->
+        <div id="prompt">
+            <div id="prompt-text"></div>
+            <button id="btn-replay" aria-label="Replay the current level">Replay</button>
+            <button id="btn-next-level" aria-label="Advance to the next level">Next Level</button>
+            <button id="btn-back-to-menu" aria-label="Return to the Fugitive menu" style="display: none;">Back to Menu</button>
+        </div>
+    </main>
+    <div id="game-footer">
+        <f1>Dough Knee Games</f1>
+        <div id="music-player">
+            <div id="track-info">Now Playing: None</div>
+            <div id="music-controls">
+                <button id="btn-mute" aria-label="Toggle mute for music">Mute</button>
+                <button id="btn-pause" aria-label="Play or pause music">Play</button>
+                <button id="btn-skip" aria-label="Skip to the next music track">Skip</button>
+                <button id="btn-shuffle" aria-label="Shuffle the music playlist">Shuffle</button>
+                <button id="btn-repeat" aria-label="Toggle repeat for music">Repeat</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        console.log('Fugitive Chess Version: 2025-06-01 Enhanced with Keyboard Controls');
+
+        // --- Constants and State ---
+        const SQUARE = 50;
+        const BOARD = 8;
+        let ctx = null;
+        let tutorialCtx = null;
+        let creativeCtx = null
+        let standardChessCtx = null;
+        let musicInitiated = false;
+        let turnTimer = null;
+        let adBoardInterval = null;
+        let turnCount = 0;
+        let isDirty = true;
+
+        // Ad Board Variables
+        let currentDesign = 0;
+        let patternIndex = 0;
+        let horizontalRow = 0;
+        let verticalCol = 0;
+        let columnStart = 0;
+        const patterns = [
+            'horizontal-forward', 'horizontal-backward', 'diagonal', 'reverse-diagonal', 'diagonal-backward', 'reverse-diagonal-backward',
+            'vertical-forward', 'vertical-backward', 'column-cycling'
+        ];
+
+        const heroes = {
+            hercules: { emoji: '🦸', effect: 'strength', description: 'Defeat guards in adjacent squares' },
+            merlin: { emoji: '🧙', effect: 'magic', description: 'Cast a random treasure effect' },
+            hanzo: { emoji: '🥷', effect: 'stealth', description: 'Move through guards undetected' },
+            musashi: { emoji: '🤺', effect: 'duel', description: 'Challenge and defeat a guard' },
+            alexander: { emoji: '🏇', effect: 'charge', description: 'Move double distance' },
+            cleopatra: { emoji: '👸', effect: 'charm', description: 'Distract all guards' },
+            siddhartha: { emoji: '🤴', effect: 'peace', description: 'Prevent guard attacks for one turn' },
+            michael: { emoji: '👼', effect: 'protection', description: 'Invincibility for one turn' },
+            solomon: { emoji: '👨‍⚖️', effect: 'wisdom', description: 'Reveal optimal path' },
+            gagarin: { emoji: '👨‍🚀', effect: 'explore', description: 'Teleport to any square' },
+            jesus: { emoji: '✝️', effect: 'resurrection', description: 'Revive if captured once' },
+            loki: { emoji: '🦹', effect: 'trickery', description: 'Swap places with a guard' }
+        };
+
+        const treasures = {
+            diamond: { symbol: '💎', effect: 'reroll', description: 'Reroll the dice' },
+            key: { symbol: '🗝️', effect: 'unlock', description: 'Unlock a hidden path' },
+            gold: { symbol: '💰', effect: 'score', description: 'Gain 100 points' },
+            shield: { symbol: '🛡️', effect: 'invincible', duration: 1, description: 'Invincible for one turn' },
+            sword: { symbol: '⚔️', effect: 'attack', description: 'Extra attack' },
+            boots: { symbol: '🏃', effect: 'double-moves', duration: 1, description: 'Double moves for one roll' },
+            spyglass: { symbol: '🔍', effect: 'reveal-guards', description: 'Reveal all guard vision' },
+            portal: { symbol: '🕳️', effect: 'teleport', description: 'Teleport to random square' },
+            potion: { symbol: '🧪', effect: 'restore-moves', description: 'Restore moves' },
+            map: { symbol: '📜', effect: 'reveal-treasures', description: 'Reveal all treasures' },
+            trident: { symbol: '🔱', effect: 'push-guards', description: 'Push guards back' },
+            excalibur: { symbol: '🗡️', effect: 'defeat-guard', description: 'Defeat any guard' },
+            mjolnir: { symbol: '🔨', effect: 'stun-guards', description: 'Stun all guards' },
+            grail: { symbol: '🍷', effect: 'invincible', duration: 2, description: 'Invincible for two turns' },
+            horn: { symbol: '📯', effect: 'distract-guards', description: 'Distract guards' },
+            bow: { symbol: '🏹', effect: 'ranged-attack', description: 'Attack from afar' },
+            crown: { symbol: '👑', effect: 'double-score', description: 'Double score' },
+            feather: { symbol: '🪶', effect: 'fly', description: 'Fly over walls' },
+            eye: { symbol: '🧿', effect: 'see-through', description: 'See through walls' },
+            storm: { symbol: '🌩️', effect: 'disrupt-vision', description: 'Disrupt guard vision' }
+        };
+
+        const points = { '①': 1, '⑤': 5, '⑩': 10 };
+
+        const pieceValues = {
+            pawn: 1,
+            knight: 3,
+            bishop: 3,
+            rook: 5,
+            queen: 9,
+            king: 0
+        };
+
+        const standardState = {
+            board: Array(8).fill(null).map(() => Array(8).fill(null)),
+            turn: 'white',
+            selected: null,
+            validMoves: [],
+            castling: { white: { king: true, kingRook: true, queenRook: true }, black: { king: true, kingRook: true, queenRook: true } },
+            enPassant: null,
+            difficulty: 'medium',
+            theme: 'light',
+            pieceStyle: 'classic',
+            turnTimer: 'off',
+            timer: null,
+            whiteTime: 600, // 10 minutes in seconds
+            blackTime: 600,
+            aiPlaysAs: null,
+            cursorRow: 0,
+            cursorCol: 0,
+            hero: null
+        };
+
+        const state = {
+            mode: 'fugitive',
+            king: [0, 0],
+            jail: [0, 0],
+            escape: [7, 7],
+            opponents: [],
+            blocked: [],
+            treasures: [],
+            collectedTreasures: [],
+            portals: 'off',
+            portalsList: [],
+            roll: 0,
+            moves: 0,
+            rolls: 0,
+            guards: 0,
+            levels: 0,
+            phase: 'waiting',
+            level: 1,
+            difficulty: 'knight',
+            theme: 'light',
+            pieceStyle: 'classic',
+            hero: null,
+            initial: null,
+            turnTimer: 'off',
+            turnLimit: 'none',
+            kingDisarmed: 'off',
+            guardsEnabled: 'on',
+            fogVision: 'off',
+            treasureDrops: 'off',
+            hiddenItems: 'off',
+            heroAbility: 'off',
+            arcadeMode: 'off',
+            score: 0,
+            pointItems: [],
+            music: {
+                audio: new Audio(),
+                playlist: [
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/dc296967db5495f973bd1fbbd385fd74468e54dc/Il%20Gambetto%20del%20Re(7).mp3', name: 'Il Gambetto del Re (7)', duration: '3:42' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/dc296967db5495f973bd1fbbd385fd74468e54dc/Il%20Gambetto%20del%20Re(6).mp3', name: 'Il Gambetto del Re (6)', duration: '4:18' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/dc296967db5495f973bd1fbbd385fd74468e54dc/Il%20Gambetto%20del%20Re(5).mp3', name: 'Il Gambetto del Re (5)', duration: '3:57' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/dc296967db5495f973bd1fbbd385fd74468e54dc/Il%20Gambetto%20del%20Re(4).mp3', name: 'Il Gambetto del Re (4)', duration: '4:02' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/dc296967db5495f973bd1fbbd385fd74468e54dc/Il%20Gambetto%20del%20Re(3).mp3', name: 'Il Gambetto del Re (3)', duration: '3:32' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/dc296967db5495f973bd1fbbd385fd74468e54dc/Il%20Gambetto%20del%20Re(2).mp3', name: 'Il Gambetto del Re (2)', duration: '4:15' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/dc296967db5495f973bd1fbbd385fd74468e54dc/Il%20Gambetto%20del%20Re(1).mp3', name: 'Il Gambetto del Re (1)', duration: '3:48' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/470b9a7bab58eb92c6af096edad59fedb737a4d7/Il%20Gambetto%20del%20Re(8).mp3', name: 'Il Gambetto del Re (8)', duration: '3:52' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/470b9a7bab58eb92c6af096edad59fedb737a4d7/Il%20Gambetto%20del%20Re(9).mp3', name: 'Il Gambetto del Re (9)', duration: '4:08' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/470b9a7bab58eb92c6af096edad59fedb737a4d7/Il%20Gambetto%20del%20Re(10).mp3', name: 'Il Gambetto del Re (10)', duration: '3:38' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/470b9a7bab58eb92c6af096edad59fedb737a4d7/Il%20Gambetto%20del%20Re(11).mp3', name: 'Il Gambetto del Re (11)', duration: '4:12' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/470b9a7bab58eb92c6af096edad59fedb737a4d7/Il%20Gambetto%20del%20Re(12).mp3', name: 'Il Gambetto del Re (12)', duration: '3:47' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/7c3b9dd1d1eb8823253ab5096e8bdc41931e9aac/Il%20Gambetto%20del%20Re(13).mp3', name: 'Il Gambetto del Re (13)', duration: '4:07' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/7c3b9dd1d1eb8823253ab5096e8bdc41931e9aac/Il%20Gambetto%20del%20Re(14).mp3', name: 'Il Gambetto del Re (14)', duration: '3:53' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/7c3b9dd1d1eb8823253ab5096e8bdc41931e9aac/Il%20Gambetto%20del%20Re(15).mp3', name: 'Il Gambetto del Re (15)', duration: '4:13' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/7c3b9dd1d1eb8823253ab5096e8bdc41931e9aac/Il%20Gambetto%20del%20Re(16).mp3', name: 'Il Gambetto del Re (16)', duration: '3:37' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/7c3b9dd1d1eb8823253ab5096e8bdc41931e9aac/Il%20Gambetto%20del%20Re(17).mp3', name: 'Il Gambetto del Re (17)', duration: '4:27' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/7c3b9dd1d1eb8823253ab5096e8bdc41931e9aac/Il%20Gambetto%20del%20Re(18).mp3', name: 'Il Gambetto del Re (18)', duration: '3:49' },
+                    { url: 'https://raw.githubusercontent.com/nickdoneysr/Fugitive/7c3b9dd1d1eb8823253ab5096e8bdc41931e9aac/Il%20Gambetto%20del%20Re(19).mp3', name: 'Il Gambetto del Re (19)', duration: '4:03' }
+                ],
+                currentTrack: 0,
+                isPlaying: false,
+                isMuted: false,
+                isRepeating: false,
+                hasErrored: false
+            }
+        };
+
+        const keyState = {};
+        document.addEventListener('keydown', (e) => {
+            keyState[e.key] = true;
+            handleKeyDown(e);
+        });
+        document.addEventListener('keyup', (e) => {
+            keyState[e.key] = false;
+        });
+
+        const themes = {
+            light: { light: '#f5f5f5', dark: '#a0a0a0', bg: '#e0e0e0', btn: '#4CAF50', btnHover: '#45a049', text: '#333', font: 'Arial, sans-serif' },
+            dark: { light: '#555', dark: '#222', bg: '#1a1a1a', btn: '#ff4444', btnHover: '#cc3333', text: '#fff', font: 'Arial, sans-serif' },
+            greyscale: { light: '#ccc', dark: '#666', bg: '#999', btn: '#777', btnHover: '#555', text: '#000', font: 'Arial, sans-serif' },
+            rgb: { light: '#ff3333', dark: '#33cc33', bg: '#3333ff', btn: '#ff00ff', btnHover: '#cc00cc', text: '#fff', font: 'Arial, sans-serif' },
+            '90s': { light: '#ff1493', dark: '#00ffff', bg: 'linear-gradient(45deg, #ff69b4, #800080)', btn: '#ff00ff', btnHover: '#cc00cc', text: '#fff', font: 'Bubblegum Sans, cursive' },
+            '80s': { light: '#ff00ff', dark: '#00ffff', bg: 'linear-gradient(45deg, #220066, #00ffff)', btn: '#ff0066', btnHover: '#cc0052', text: '#fff', font: 'VCR OSD Mono, monospace' },
+            '70s': { light: '#ffdb58', dark: '#568203', bg: 'linear-gradient(45deg, #ffdb58, #8b4513)', btn: '#228b22', btnHover: '#1a6b1a', text: '#333', font: 'Bebas Neue, sans-serif' },
+            neon: { light: '#ff69b4', dark: '#00b7eb', bg: '#000', btn: '#39ff14', btnHover: '#2ecc10', text: '#fff', font: 'Orbitron, sans-serif' },
+            paint: { light: '#ff0000', dark: '#ffff00', bg: '#f5f5f5', btn: '#0000ff', btnHover: '#0000cc', text: '#333', font: 'Permanent Marker, cursive' },
+            galaxy: { light: '#4b0082', dark: '#191970', bg: 'linear-gradient(45deg, #2a1a4b, #000080)', btn: '#ff00ff', btnHover: '#cc00cc', text: '#fff', font: 'Exo 2, sans-serif' },
+            pirate: { light: '#8b4513', dark: '#3c2f2f', bg: 'linear-gradient(45deg, #4682b4, #2f4f4f)', btn: '#ffd700', btnHover: '#cca300', text: '#fff', font: 'Cabin, sans-serif' },
+            cyberpunk: { light: '#00ff00', dark: '#9932cc', bg: 'linear-gradient(45deg, #0a0a23, #2f004f)', btn: '#ff1493', btnHover: '#cc1076', text: '#fff', font: 'Rajdhani, sans-serif' },
+            'retro-arcade': { light: '#ff0000', dark: '#0000ff', bg: '#000', btn: '#00ff00', btnHover: '#00cc00', text: '#fff', font: 'Press Start 2P, cursive' },
+            nature: { light: '#228b22', dark: '#8b4513', bg: 'linear-gradient(45deg, #556b2f, #deb887)', btn: '#6b8e23', btnHover: '#556b2f', text: '#fff', font: 'Cabin, sans-serif' },
+            steampunk: { light: '#d4a373', dark: '#3c2f2f', bg: '#8b5a2b', btn: '#b8860b', btnHover: '#8b6508', text: '#f5f5dc', font: 'Cabin, sans-serif' },
+            mythology: { light: '#f4e4bc', dark: '#483c32', bg: '#b68f40', btn: '#b22222', btnHover: '#8b1a1a', text: '#fffaf0', font: 'MedievalSharp, cursive' },
+            underwater: { light: '#66cdaa', dark: '#2e8b57', bg: '#20b2aa', btn: '#ff4500', btnHover: '#cd3700', text: '#f0f8ff', font: 'Cabin, sans-serif' },
+            desert: { light: '#edc9af', dark: '#8b4513', bg: '#f4a460', btn: '#cd853f', btnHover: '#a0522d', text: '#333', font: 'Cabin, sans-serif' },
+            jungle: { light: '#228b22', dark: '#006400', bg: '#2e8b57', btn: '#6b8e23', btnHover: '#556b2f', text: '#fff', font: 'Cabin, sans-serif' },
+            space: { light: '#4b0082', dark: '#191970', bg: '#000080', btn: '#ff00ff', btnHover: '#cc00cc', text: '#fff', font: 'Audiowide, sans-serif' },
+            ice: { light: '#e0ffff', dark: '#4682b4', bg: '#b0e0e6', btn: '#00ced1', btnHover: '#0099a8', text: '#333', font: 'Cabin, sans-serif' },
+            volcano: { light: '#ff4500', dark: '#8b0000', bg: 'linear-gradient(45deg, #ff8c00, #4b1a00)', btn: '#ff6347', btnHover: '#cd4f39', text: '#fff', font: 'Cabin, sans-serif' },
+            candy: { light: '#ffb6c1', dark: '#ff69b4', bg: 'linear-gradient(45deg, #ffebcd, #ff00ff)', btn: '#ff1493', btnHover: '#cc1076', text: '#333', font: 'Bubblegum Sans, cursive' },
+            haunted: { light: '#778899', dark: '#2f4f4f', bg: 'linear-gradient(45deg, #483d8b, #000000)', btn: '#ff4500', btnHover: '#cd3700', text: '#fff', font: 'Creepster, cursive' },
+            circus: { light: '#ff4500', dark: '#ffd700', bg: 'linear-gradient(45deg, #ff0000, #ffff00)', btn: '#1e90ff', btnHover: '#1c7ed6', text: '#333', font: 'Hanalei Fill, cursive' },
+            dream: { light: '#e6e6fa', dark: '#dda0dd', bg: 'linear-gradient(45deg, #b0c4de, #ff69b4)', btn: '#9932cc', btnHover: '#7a28a3', text: '#fff', font: 'Cabin, sans-serif' },
+            noir: { light: '#696969', dark: '#2f2f2f', bg: '#000000', btn: '#b0c4de', btnHover: '#8fa3c4', text: '#fff', font: 'Nosifer, cursive' }
+        };
+
+        const pieceStyles = {
+            classic: { pawn: '♟', rook: '♜', knight: '♞', bishop: '♝', queen: '♛', king: '👑' },
+            emoji: { pawn: '🥷', rook: '🏰', knight: '🐎', bishop: '⛪', queen: '👸', king: '🤴' },
+            minimalist: { pawn: 'P', rook: 'R', knight: 'N', bishop: 'B', queen: 'Q', king: 'K' },
+            fantasy: { pawn: '🧙', rook: '🏰', knight: '⚔️', bishop: '🧝', queen: '👑', king: '🤴' },
+            scifi: { pawn: '🤖', rook: '🛰️', knight: '🚀', bishop: '👽', queen: '🌌', king: '👨‍🚀' },
+            historical: { pawn: '⚔️', rook: '🛡️', knight: '🐎', bishop: '📜', queen: '👑', king: '🤴' },
+            medieval: { pawn: '🛡️', rook: '🏰', knight: '🗡️', bishop: '🧙', queen: '👸', king: '🤴' },
+            futuristic: { pawn: '🤖', rook: '🛸', knight: '🚀', bishop: '👾', queen: '🌠', king: '👨‍🚀' },
+            'animal-kingdom': { pawn: '🐒', rook: '🦏', knight: '🦓', bishop: '🦅', queen: '🦁', king: '🐘' },
+            'pirate-crew': { pawn: '🏴‍☠️', rook: '⚓', knight: '⚔️', bishop: '🗺️', queen: '👑', king: '🏴‍☠️👑' },
+            cybernetic: { pawn: '🤖', rook: '💾', knight: '🔋', bishop: '🖥️', queen: '🌐', king: '🦾' },
+            mythic: { pawn: '🧜', rook: '🏛️', knight: '🦄', bishop: '🔮', queen: '🌟', king: '⚡' },
+            'circus-troupe': { pawn: '🤡', rook: '🎪', knight: '🎯', bishop: '🎭', queen: '🎨', king: '🎩' },
+            'steampunk-gadgets': { pawn: '⚙️', rook: '🕰️', knight: '🔧', bishop: '🔩', queen: '🧳', king: '🧭' },
+            elemental: { pawn: '💧', rook: '🔥', knight: '💨', bishop: '🌍', queen: '⚡', king: '🌞' },
+            ghostly: { pawn: '👻', rook: '🏚️', knight: '🕯️', bishop: '💀', queen: '🌙', king: '👻👑' },
+            'candy-cast': { pawn: '🍬', rook: '🍫', knight: '🍭', bishop: '🍰', queen: '🍩', king: '🍦' },
+            catholic: { pawn: '🙏', rook: '🏰', knight: '⚔️', bishop: '⛪', queen: '👿', king: '✝️' }
+        };
+
+        const blocks = {
+            pawn: 4,
+            knight: 8,
+            rook: 12,
+            bishop: 16,
+            queen: 20,
+            king: 24
+        };
+
+        const levels = Array(100).fill().map((_, i) => {
+            const level = i + 1;
+            if (level <= 20) return { pawns: Math.min(3 + Math.floor(level / 5), 8), rooks: 0, knights: 0, bishops: 0, queen: 0 };
+            if (level <= 40) return { pawns: 4, rooks: Math.floor(level / 20), knights: Math.floor(level / 15), bishops: 0, queen: 0 };
+            if (level <= 60) return { pawns: 5, rooks: 1, knights: 1, bishops: Math.floor(level / 25), queen: 0 };
+            if (level <= 80) return { pawns: 6, rooks: 1, knights: 1, bishops: 1, queen: Math.floor(level / 50) };
+            return { pawns: 8, rooks: 2, knights: 2, bishops: 2, queen: 1 };
+        });
+
+        // --- Navigation Functions ---
+        function showSection(sectionId) {
+            const sections = ['start-page', 'fugitive-menu', 'game-area', 'creative-mode', 'tutorial-section', 'settings-section', 'rules-section', 'standard-chess-section'];
+            sections.forEach(id => {
+                const section = document.getElementById(id);
+                if (section) section.style.display = id === sectionId ? 'flex' : 'none';
+            });
+            document.getElementById('prompt').style.display = 'none';
+            if (sectionId === 'start-page') {
+                generateAdBoard();
+                adBoardInterval = setInterval(generateAdBoard, 5000);
+            } else {
+                clearInterval(adBoardInterval);
+            }
+            clearInterval(turnTimer);
+            clearInterval(standardState.timer);
+
+            // Manage canvas visibility
+            const canvases = {
+                'game-area': 'board',
+                'tutorial-section': 'tutorial-board',
+                'creative-mode': 'creative-board',
+                'standard-chess-section': 'standard-chess-board'
+            };
+            Object.entries(canvases).forEach(([section, canvasId]) => {
+                const canvas = document.getElementById(canvasId);
+                if (canvas) canvas.style.display = section === sectionId ? 'block' : 'none';
+            });
+
+            // Ensure redraw after showing section
+            if (sectionId === 'standard-chess-section') {
+                setTimeout(drawStandardBoard, 0);
+            } else if (sectionId === 'game-area') {
+                setTimeout(drawBoard, 0);
+            } else if (sectionId === 'creative-mode') {
+                setTimeout(drawCreativeBoard, 0);
+            } else if (sectionId === 'tutorial-section') {
+                setTimeout(drawBoard, 0);
+            }
+        }
+
+        function showStartPage() {
+            showSection('start-page');
+            clearInterval(turnTimer);
+        }
+
+        // --- Utility Functions ---
+        function generateAdBoard() {
+            const themeKeys = Object.keys(themes);
+            const randomThemeKey = themeKeys[Math.floor(Math.random() * themeKeys.length)];
+            const theme = themes[randomThemeKey];
+            const currentPattern = patterns[patternIndex];
+            let positions = [];
+            const letters = 'FUGITIVE'.split('');
+
+            if (currentPattern === 'horizontal-forward') {
+                const row = horizontalRow;
+                for (let col = 0; col < 8; col++) positions.push([row, col]);
+                horizontalRow = (horizontalRow + 1) % 8;
+            } else if (currentPattern === 'horizontal-backward') {
+                const row = horizontalRow;
+                for (let col = 7; col >= 0; col--) positions.push([row, col]);
+                horizontalRow = (horizontalRow + 1) % 8;
+            } else if (currentPattern === 'diagonal') {
+                for (let i = 0; i < 8; i++) positions.push([i, i]);
+            } else if (currentPattern === 'reverse-diagonal') {
+                for (let i = 0; i < 8; i++) positions.push([i, 7 - i]);
+            } else if (currentPattern === 'diagonal-backward') {
+                for (let i = 7; i >= 0; i--) positions.push([i, i]);
+            } else if (currentPattern === 'reverse-diagonal-backward') {
+                for (let i = 7; i >= 0; i--) positions.push([i, 7 - i]);
+            } else if (currentPattern === 'vertical-forward') {
+                const col = verticalCol;
+                for (let row = 0; row < 8; row++) positions.push([row, col]);
+                verticalCol = (verticalCol + 1) % 8;
+            } else if (currentPattern === 'vertical-backward') {
+                const col = verticalCol;
+                for (let row = 7; row >= 0; row--) positions.push([row, col]);
+                verticalCol = (verticalCol + 1) % 8;
+            } else if (currentPattern === 'column-cycling') {
+                for (let i = 0; i < 8; i++) {
+                    const col = (columnStart + i) % 8;
+                    positions.push([0, col]);
+                }
+                columnStart = (columnStart + 1) % 8;
+            }
+
+            patternIndex = (patternIndex + 1) % patterns.length;
+            const board = document.getElementById('ad-board-container');
+            board.innerHTML = '';
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'square';
+                    const isLight = (row + col) % 2 === 0;
+                    cell.style.backgroundColor = isLight ? theme.light : theme.dark;
+                    const letterIndex = positions.findIndex(p => p[0] === row && p[1] === col);
+                    if (letterIndex !== -1) {
+                        const span = document.createElement('span');
+                        span.className = 'text';
+                        span.textContent = letters[letterIndex];
+                        span.style.color = theme.text;
+                        cell.appendChild(span);
+                    }
+                    board.appendChild(cell);
+                }
+            }
+        }
+
+        function getSongDisplayName(track) {
+            return track.name;
+        }
+
+        function manhattanDistance(pos1, pos2) {
+            return Math.abs(pos1[0] - pos2[0]) + Math.abs(pos1[1] - pos2[1]);
+        }
+
+        function getRandomSquare(occupied) {
+            const allOccupied = (occupied || []).concat(
+                state.blocked,
+                state.opponents.map(op => op.pos),
+                state.treasures.map(t => t.pos),
+                [state.king]
+            ).filter(pos => pos && pos[0] >= 0 && pos[0] < BOARD && pos[1] >= 0 && pos[1] < BOARD);
+            let pos;
+            let attempts = 0;
+            do {
+                pos = [Math.floor(Math.random() * BOARD), Math.floor(Math.random() * BOARD)];
+                attempts++;
+                if (attempts > 20) {
+                    for (let row = 0; row < BOARD; row++) {
+                        for (let col = 0; col < BOARD; col++) {
+                            if (!allOccupied.some(p => p[0] === row && p[1] === col)) return [row, col];
+                        }
+                    }
+                    return [0, 0];
+                }
+            } while (allOccupied.some(p => p[0] === pos[0] && p[1] === pos[1]));
+            return pos;
+        }
+
+        function getLinkedPortal(pos) {
+            for (const pair of state.portalsList) {
+                if (pair[0][0] === pos[0] && pair[0][1] === pos[1]) return pair[1];
+                else if (pair[1][0] === pos[0] && pair[1][1] === pos[1]) return pair[0];
+            }
+            return null;
+        }
+
+        // --- Initialization Functions ---
+        function initializeGame() {
+            try {
+                const canvas = document.getElementById('board');
+                if (!canvas) throw new Error('Canvas (#board) not found');
+                ctx = canvas.getContext('2d');
+                if (!ctx) throw new Error('Canvas context unavailable for #board');
+
+                const tutorialCanvas = document.getElementById('tutorial-board');
+                if (!tutorialCanvas) throw new Error('Tutorial canvas (#tutorial-board) not found');
+                tutorialCtx = tutorialCanvas.getContext('2d');
+                if (!tutorialCtx) throw new Error('Tutorial canvas context unavailable');
+
+                const creativeCanvas = document.getElementById('creative-board');
+                if (!creativeCanvas) throw new Error('Creative canvas (#creative-board) not found');
+                creativeCtx = creativeCanvas.getContext('2d');
+                if (!creativeCtx) throw new Error('Creative canvas context unavailable');
+
+                const standardCanvas = document.getElementById('standard-chess-board');
+                if (!standardCanvas) throw new Error('Standard Chess canvas (#standard-chess-board) not found');
+                standardChessCtx = standardCanvas.getContext('2d');
+                if (!standardChessCtx) throw new Error('Standard Chess canvas context unavailable');
+
+                // Load custom themes (Insert here)
+                const customThemes = JSON.parse(localStorage.getItem('fugitiveCustomThemes')) || {};
+                Object.keys(customThemes).forEach(key => {
+                    themes[`custom:${key}`] = customThemes[key];
+                });
+
+                const fugitiveMenu = document.getElementById('fugitive-menu');
+                if (!fugitiveMenu) throw new Error('Fugitive menu (#fugitive-menu) not found');
+
+                const gameArea = document.getElementById('game-area');
+                if (!gameArea) throw new Error('Game area (#game-area) not found');
+
+                state.music.audio.volume = 0.5;
+                state.music.audio.addEventListener('ended', () => {
+                    if (state.music.isRepeating) playMusic();
+                    else skipTrack();
+                });
+                state.music.audio.onerror = () => {
+                    state.music.hasErrored = true;
+                    console.error('Audio error:', state.music.audio.error);
+                    skipTrack();
+                };
+                state.music.audio.oncanplay = () => {
+                    if (!state.music.hasErrored && state.music.isPlaying) state.music.audio.play().catch(console.error);
+                };
+
+                state.music.currentTrack = 0;
+                document.getElementById('song-select').value = "0";
+                document.getElementById('btn-pause').textContent = 'Play';
+                document.getElementById('track-info').textContent = `Selected: ${getSongDisplayName(state.music.playlist[state.music.currentTrack])}`;
+
+                initLevelDropdown();
+                initDifficultyDropdown();
+                initThemeDropdown();
+                initPieceStyleDropdown();
+                initHeroDropdown();
+                initSongSelect();
+                initButtons();
+                initCanvasEvents();
+                initStandardDropdowns();
+                initStandardButtons();
+                initStandardCanvasEvents();
+                applyTheme();
+                updateStats();
+                requestAnimationFrame(gameLoop);
+
+                // Add event listener for the reset button
+                const resetButton = document.getElementById('btn-standard-reset');
+                if (resetButton) {
+                    resetButton.addEventListener('click', resetStandardChess);
+                } else {
+                    console.warn('Reset button (#btn-standard-reset) not found');
+                }
+
+                fugitiveMenu.addEventListener('click', startMusicOnInteraction);
+                const selects = fugitiveMenu.querySelectorAll('select');
+                selects.forEach(select => select.addEventListener('change', startMusicOnInteraction));
+
+                showStartPage();
+
+                document.getElementById('music-volume').addEventListener('input', (e) => {
+                    state.music.audio.volume = parseFloat(e.target.value);
+                });
+
+            } catch (error) {
+                console.error('Initialization failed:', error);
+                alert(`Game failed to load: ${error.message}`);
+            }
+        }
+
+        function initLevelDropdown() {
+            const level = document.getElementById('level');
+            if (!level) return;
+            level.innerHTML = '';
+            for (let i = 1; i <= 100; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Level ${i}`;
+                if (i === state.level) option.selected = true;
+                level.appendChild(option);
+            }
+            level.addEventListener('change', (e) => {
+                state.level = parseInt(e.target.value, 10) || 1;
+                state.level = Math.max(1, Math.min(state.level, 100));
+                document.getElementById('level-info').textContent = `Level ${state.level}`;
+                updateStats();
+                if (document.getElementById('game-area').style.display === 'flex') {
+                    initBoard();
+                    drawBoard();
+                }
+            });
+            level.value = state.level;
+        }
+
+        function initDifficultyDropdown() {
+            const difficulty = document.getElementById('difficulty');
+            if (!difficulty) return;
+            difficulty.value = state.difficulty;
+            difficulty.addEventListener('change', (e) => {
+                state.difficulty = e.target.value;
+                updateStats();
+                if (document.getElementById('game-area').style.display === 'flex') {
+                    initBoard();
+                    drawBoard();
+                }
+            });
+        }
+
+        function initThemeDropdown() {
+            const theme = document.getElementById('theme');
+            if (!theme) return;
+            theme.innerHTML = '';
+            Object.keys(themes).forEach(themeKey => {
+                if (themeKey !== 'random') { // Exclude 'random' from initial list
+                    const option = document.createElement('option');
+                    option.value = themeKey;
+                    if (themeKey.startsWith('custom:')) {
+                        const name = themeKey.slice(7);
+                        option.textContent = `${name} (custom)`;
+                    } else {
+                        option.textContent = themeKey.charAt(0).toUpperCase() + themeKey.slice(1);
+                    }
+                    theme.appendChild(option);
+                }
+            });
+            const randomOption = document.createElement('option');
+            randomOption.value = 'random';
+            randomOption.textContent = 'Random';
+            theme.appendChild(randomOption);
+            theme.value = state.theme;
+            theme.addEventListener('change', (e) => {
+                const selected = e.target.value;
+                if (selected === 'random') {
+                    setRandomTheme();
+                } else {
+                    state.theme = selected;
+                    applyTheme();
+                    if (document.getElementById('game-area').style.display === 'flex') drawBoard();
+                }
+            });
+        }
+
+        function initPieceStyleDropdown() {
+            const pieceStyle = document.getElementById('piece-style');
+            if (!pieceStyle) return;
+            pieceStyle.value = state.pieceStyle;
+            pieceStyle.addEventListener('change', (e) => {
+                state.pieceStyle = e.target.value;
+                if (!pieceStyles[state.pieceStyle]) state.pieceStyle = 'classic';
+                if (document.getElementById('game-area').style.display === 'flex') drawBoard();
+            });
+        }
+
+        function initHeroDropdown() {
+            const select = document.getElementById('hero-select');
+            select.innerHTML = '<option value="-1">None Selected</option>';
+            Object.keys(heroes).forEach((heroKey, index) => {
+                const hero = heroes[heroKey];
+                const option = document.createElement('option');
+                option.value = heroKey;
+                option.textContent = `${hero.emoji} ${heroKey.charAt(0).toUpperCase() + heroKey.slice(1)}`;
+                select.appendChild(option);
+            });
+            select.value = -1;
+            select.addEventListener('change', (e) => {
+                const heroKey = e.target.value;
+                state.hero = heroKey !== '-1' ? heroKey : null;
+                if (document.getElementById('game-area').style.display === 'flex') drawBoard();
+            });
+        }
+
+        function initSongSelect() {
+            const select = document.getElementById('song-select');
+            state.music.playlist.forEach((track, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = getSongDisplayName(track);
+                select.appendChild(option);
+            });
+            select.value = "0";
+            select.addEventListener('change', (e) => {
+                const index = parseInt(e.target.value, 10);
+                if (!isNaN(index)) {
+                    state.music.currentTrack = index;
+                    if (state.music.isPlaying) playMusic();
+                    else document.getElementById('track-info').textContent = `Selected: ${getSongDisplayName(state.music.playlist[state.music.currentTrack])}`;
+                }
+            });
+        }
+
+        function initStandardDropdowns() {
+            const themeSelect = document.getElementById('standard-theme');
+            themeSelect.innerHTML = '';
+            Object.keys(themes).forEach(themeKey => {
+                if (themeKey !== 'random') {
+                    const option = document.createElement('option');
+                    option.value = themeKey;
+                    if (themeKey.startsWith('custom:')) {
+                        const name = themeKey.slice(7);
+                        option.textContent = `${name} (custom)`;
+                    } else {
+                        option.textContent = themeKey.charAt(0).toUpperCase() + themeKey.slice(1);
+                    }
+                    themeSelect.appendChild(option);
+                }
+            });
+            const randomOption = document.createElement('option');
+            randomOption.value = 'random';
+            randomOption.textContent = 'Random';
+            themeSelect.appendChild(randomOption);
+            themeSelect.value = standardState.theme;
+            themeSelect.addEventListener('change', (e) => {
+                const selected = e.target.value;
+                if (selected === 'random') {
+                    setRandomTheme();
+                } else {
+                    standardState.theme = selected;
+                    drawStandardBoard();
+                    isDirty = true;
+                }
+            });
+
+            const pieceStyleSelect = document.getElementById('standard-piece-style');
+            Object.keys(pieceStyles).forEach(style => {
+                const option = document.createElement('option');
+                option.value = style;
+                option.textContent = style.charAt(0).toUpperCase() + style.slice(1);
+                pieceStyleSelect.appendChild(option);
+            });
+            pieceStyleSelect.value = standardState.pieceStyle;
+            pieceStyleSelect.addEventListener('change', (e) => {
+                standardState.pieceStyle = e.target.value;
+                drawStandardBoard();
+            });
+
+            const songSelect = document.getElementById('standard-song-select');
+            state.music.playlist.forEach((track, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = getSongDisplayName(track);
+                songSelect.appendChild(option);
+            });
+            songSelect.addEventListener('change', (e) => {
+                const index = parseInt(e.target.value, 10);
+                if (!isNaN(index)) {
+                    state.music.currentTrack = index;
+                    if (state.music.isPlaying) playMusic();
+                    else document.getElementById('track-info').textContent = `Selected: ${getSongDisplayName(state.music.playlist[state.music.currentTrack])}`;
+                }
+            });
+
+            // Add Hero dropdown population
+            const heroSelect = document.getElementById('standard-hero-select');
+            heroSelect.innerHTML = '<option value="-1">None Selected</option>';
+            Object.keys(heroes).forEach((heroKey) => {
+                const hero = heroes[heroKey];
+                const option = document.createElement('option');
+                option.value = heroKey;
+                option.textContent = `${hero.emoji} ${heroKey.charAt(0).toUpperCase() + heroKey.slice(1)}`;
+                heroSelect.appendChild(option);
+            });
+            heroSelect.value = '-1';
+            heroSelect.addEventListener('change', (e) => {
+                const heroKey = e.target.value;
+                standardState.hero = heroKey !== '-1' ? heroKey : null;
+                drawStandardBoard();
+                isDirty = true; // Ensure redraw
+            });
+        }
+
+        function initStandardButtons() {
+            const buttons = [
+                { id: 'btn-random-theme', fn: setRandomTheme },
+                { id: 'btn-mute', fn: toggleMute },
+                { id: 'btn-pause', fn: togglePause },
+                { id: 'btn-skip', fn: skipTrack },
+                { id: 'btn-shuffle', fn: shufflePlaylist },
+                { id: 'btn-repeat', fn: toggleRepeat },
+                { id: 'btn-save', fn: saveGame },
+                { id: 'btn-load', fn: loadGame },
+                { id: 'btn-to-standard', fn: () => showSection('standard-chess-section') },
+                { id: 'btn-standard-random-theme', fn: setRandomTheme },
+                { id: 'btn-standard-play', fn: startStandardChess },
+                { id: 'btn-back-to-start-standard', fn: showStartPage }
+            ];
+            buttons.forEach(({ id, fn }) => {
+                const btn = document.getElementById(id);
+                if (btn) btn.addEventListener('click', fn);
+            });
+        }
+
+        function initButtons() {
+            const buttons = [
+                { id: 'btn-to-fugitive', fn: () => showSection('fugitive-menu') },
+                { id: 'btn-to-creative', fn: () => { showSection('creative-mode'); startCreativeMode(); } },
+                { id: 'btn-to-tutorial', fn: () => { showSection('tutorial-section'); startTutorial(); } },
+                { id: 'btn-to-settings', fn: () => showSection('settings-section') },
+                { id: 'btn-to-rules', fn: () => showSection('rules-section') },
+                { id: 'btn-random-theme', fn: setRandomTheme },
+                { id: 'btn-play', fn: startGame },
+                { id: 'btn-random-start', fn: randomStart },
+                { id: 'btn-roll', fn: rollDice },
+                { id: 'btn-menu', fn: () => showSection('fugitive-menu') },
+                { id: 'btn-reset', fn: resetLevel },
+                { id: 'btn-restart', fn: restartLevel },
+                { id: 'btn-replay', fn: replayLevel },
+                { id: 'btn-next-level', fn: nextLevel },
+                { id: 'btn-back-to-menu', fn: () => showSection('fugitive-menu') },
+                { id: 'btn-mute', fn: toggleMute },
+                { id: 'btn-pause', fn: togglePause },
+                { id: 'btn-skip', fn: skipTrack },
+                { id: 'btn-shuffle', fn: shufflePlaylist },
+                { id: 'btn-repeat', fn: toggleRepeat },
+                { id: 'btn-save', fn: saveGame },
+                { id: 'btn-load', fn: loadGame },
+                { id: 'btn-back-to-start-fugitive', fn: showStartPage },
+                { id: 'btn-back-to-start-game', fn: showStartPage },
+                { id: 'btn-back-to-start-creative', fn: showStartPage },
+                { id: 'btn-back-to-start-tutorial', fn: showStartPage },
+                { id: 'btn-back-to-start-settings', fn: showStartPage },
+                { id: 'btn-back-to-start-rules', fn: showStartPage },
+                { id: 'btn-save-theme', fn: saveCurrentTheme }
+            ];
+            buttons.forEach(({ id, fn }) => {
+                const btn = document.getElementById(id);
+                if (btn) btn.addEventListener('click', fn);
+            });
+        }
+
+        function initCanvasEvents() {
+            const canvas = document.getElementById('board');
+            if (canvas && ctx) {
+                let hoveredGuard = null;
+                canvas.addEventListener('mousemove', (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const col = Math.floor((e.clientX - rect.left) / SQUARE);
+                    const row = Math.floor((e.clientY - rect.top) / SQUARE);
+                    if (state.fogVision === 'on') {
+                        const vision = getKingVision();
+                        const visionSet = new Set(vision.map(([r, c]) => `${r},${c}`));
+                        hoveredGuard = visionSet.has(`${row},${col}`) ? state.opponents.find(op => op.pos[0] === row && op.pos[1] === col) || null : null;
+                    } else {
+                        hoveredGuard = state.opponents.find(op => op.pos[0] === row && op.pos[1] === col) || null;
+                    }
+                    window.hoveredGuard = hoveredGuard;
+                    drawBoard();
+                });
+                canvas.addEventListener('click', (e) => {
+                    if (state.phase !== 'moving') return;
+                    const rect = canvas.getBoundingClientRect();
+                    const col = Math.floor((e.clientX - rect.left) / SQUARE);
+                    const row = Math.floor((e.clientY - rect.top) / SQUARE);
+                    const validMoves = getValidMoves();
+                    if (validMoves.some(m => m[0] === row && m[1] === col)) moveKing(row, col);
+                    else document.getElementById('game-info').textContent = 'Invalid move. Use arrow keys or WASD';
+                });
+            }
+
+            const tutorialCanvas = document.getElementById('tutorial-board');
+            if (tutorialCanvas && tutorialCtx) {
+                tutorialCanvas.addEventListener('click', (e) => {
+                    if (state.phase !== 'moving' || state.mode !== 'tutorial') return;
+                    const rect = tutorialCanvas.getBoundingClientRect();
+                    const col = Math.floor((e.clientX - rect.left) / SQUARE);
+                    const row = Math.floor((e.clientY - rect.top) / SQUARE);
+                    const validMoves = getValidMoves();
+                    if (validMoves.some(m => m[0] === row && m[1] === col)) moveKing(row, col);
+                });
+            }
+        }
+
+        // --- Event Handlers ---
+        function startMusicOnInteraction() {
+            if (!musicInitiated) {
+                playMusic();
+                musicInitiated = true;
+            }
+        }
+
+        function handleKeyDown(e) {
+            const gameAreaVisible = document.getElementById('game-area').style.display === 'flex';
+            const tutorialVisible = document.getElementById('tutorial-section').style.display === 'flex';
+            const promptVisible = document.getElementById('prompt').style.display === 'block';
+
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
+
+            if ((gameAreaVisible || tutorialVisible) && !promptVisible) {
+                if (state.phase === 'waiting' && e.key === ' ') {
+                    rollDice();
+                    return;
+                }
+                if (state.phase === 'moving') {
+                    const directions = {
+                        'ArrowUp': [-1, 0], 'w': [-1, 0],
+                        'ArrowDown': [1, 0], 's': [1, 0],
+                        'ArrowLeft': [0, -1], 'a': [0, -1],
+                        'ArrowRight': [0, 1], 'd': [0, 1]
+                    };
+                    let dr = 0, dc = 0;
+                    if (keyState['ArrowUp'] || keyState['w']) dr -= 1;
+                    if (keyState['ArrowDown'] || keyState['s']) dr += 1;
+                    if (keyState['ArrowLeft'] || keyState['a']) dc -= 1;
+                    if (keyState['ArrowRight'] || keyState['d']) dc += 1;
+
+                    if (dr !== 0 || dc !== 0) {
+                        const newRow = state.king[0] + dr;
+                        const newCol = state.king[1] + dc;
+                        const validMoves = getValidMoves();
+                        if (validMoves.some(m => m[0] === newRow && m[1] === newCol)) {
+                            moveKing(newRow, newCol);
+                        } else {
+                            const info = tutorialVisible ? 'tutorial-info' : 'game-info';
+                            document.getElementById(info).textContent = 'Invalid move. Use arrow keys or WASD';
+                        }
+                    }
+                }
+            }
+
+            // Add Standard Chess keyboard controls
+            if (state.mode === 'standard' && !promptVisible) {
+                if (!e.repeat) {  // Only process if not a repeat event
+                    if (e.key === 'ArrowUp') {
+                        standardState.cursorRow = Math.max(0, standardState.cursorRow - 1);
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowDown') {
+                        standardState.cursorRow = Math.min(7, standardState.cursorRow + 1);
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowLeft') {
+                        standardState.cursorCol = Math.max(0, standardState.cursorCol - 1);
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowRight') {
+                        standardState.cursorCol = Math.min(7, standardState.cursorCol + 1);
+                        e.preventDefault();
+                    }
+                    drawStandardBoard();
+                    isDirty = true; // Ensure redraw
+                }
+                if (e.key === 'Enter' || e.key === ' ') {
+                    handleStandardKeyboardSelect();
+                    e.preventDefault();
+                }
+            }
+
+            const ctrl = e.ctrlKey;
+            const key = e.key.toLowerCase();
+            const hotkeys = {
+                'n': nextLevel, 'r': replayLevel, 's': saveGame, 'l': loadGame, 'm': () => showSection('fugitive-menu'),
+                't': toggleMute, 'p': togglePause, 'k': skipTrack, 'h': shufflePlaylist, 'e': toggleRepeat
+            };
+
+            if (ctrl && hotkeys[key]) {
+                e.preventDefault();
+                hotkeys[key]();
+            } else if (promptVisible && !ctrl) {
+                if (key === 'r') replayLevel();
+                else if (key === 'n') nextLevel();
+                else if (key === 'm') showSection('fugitive-menu');
+            }
+        }
+
+        // --- Game Logic Functions ---
+        function startGame() {
+            const difficulty = document.getElementById('difficulty').value;
+            const level = document.getElementById('level').value;
+            const theme = document.getElementById('theme').value;
+            const pieceStyle = document.getElementById('piece-style').value;
+            const turnTimer = document.getElementById('turn-timer').value;
+            const turnLimit = document.getElementById('turn-limit').value;
+            const kingDisarmed = document.getElementById('king-disarmed').value;
+            const guardsEnabled = document.getElementById('guards').value;
+            const treasureDrops = document.getElementById('treasure-drops').value;
+            const hiddenItems = document.getElementById('hidden-items').value;
+            const heroAbility = document.getElementById('hero-ability').value;
+            const portals = parseInt(document.getElementById('portals').value, 10);
+            const arcadeMode = document.getElementById('arcade-mode').value;
+            state.difficulty = difficulty;
+            state.level = parseInt(level, 10) || 1;
+            state.theme = theme;
+            state.pieceStyle = pieceStyle;
+            state.turnTimer = turnTimer;
+            state.turnLimit = turnLimit;
+            state.kingDisarmed = kingDisarmed;
+            state.guardsEnabled = guardsEnabled;
+            state.treasureDrops = treasureDrops;
+            state.hiddenItems = hiddenItems;
+            state.heroAbility = heroAbility;
+            state.fogVision = document.getElementById('fog-vision').value;
+            state.portals = isNaN(portals) ? 0 : portals;
+            state.arcadeMode = arcadeMode;
+            if (arcadeMode === 'on') state.score = 0;
+            state.level = Math.max(1, Math.min(state.level, 100));
+            turnCount = 0;
+            showSection('game-area');
+            initBoard();
+            updateStats();
+            drawBoard();
+            displayModeRules();
+        }
+
+        function randomStart() {
+            const difficulties = ['pawn', 'knight', 'rook', 'bishop', 'queen', 'king'];
+            state.difficulty = difficulties[Math.floor(Math.random() * difficulties.length)];
+            state.level = Math.floor(Math.random() * 100) + 1;
+            state.theme = document.getElementById('theme').value;
+            state.pieceStyle = document.getElementById('piece-style').value;
+            const heroKeys = Object.keys(heroes);
+            const heroIndex = Math.floor(Math.random() * (heroKeys.length + 1)) - 1;
+            state.hero = heroIndex >= 0 ? heroKeys[heroIndex] : null;
+            state.turnTimer = Math.random() < 0.5 ? 'on' : 'off';
+            state.turnLimit = ['none', '5', '10', '15'][Math.floor(Math.random() * 4)];
+            state.kingDisarmed = Math.random() < 0.5 ? 'on' : 'off';
+            state.guardsEnabled = Math.random() < 0.5 ? 'on' : 'off';
+            state.treasureDrops = Math.random() < 0.5 ? 'on' : 'off';
+            state.hiddenItems = Math.random() < 0.5 ? 'on' : 'off';
+            state.heroAbility = Math.random() < 0.5 ? 'on' : 'off';
+            state.fogVision = Math.random() < 0.5 ? 'on' : 'off';
+            state.portals = Math.floor(Math.random() * 4);
+            state.arcadeMode = Math.random() < 0.5 ? 'on' : 'off';
+            document.getElementById('difficulty').value = state.difficulty;
+            document.getElementById('level').value = state.level;
+            document.getElementById('hero-select').value = state.hero || -1;
+            document.getElementById('turn-timer').value = state.turnTimer;
+            document.getElementById('turn-limit').value = state.turnLimit;
+            document.getElementById('king-disarmed').value = state.kingDisarmed;
+            document.getElementById('guards').value = state.guardsEnabled;
+            document.getElementById('treasure-drops').value = state.treasureDrops;
+            document.getElementById('hidden-items').value = state.hiddenItems;
+            document.getElementById('arcade-mode').value = state.arcadeMode;
+            document.getElementById('hero-ability').value = state.heroAbility;
+            document.getElementById('portals').value = state.portals.toString();
+            document.getElementById('level-info').textContent = `Level ${state.level}`;
+            turnCount = 0;
+            showSection('game-area');
+            initBoard();
+            updateStats();
+            drawBoard();
+            displayModeRules();
+        }
+
+        function rollDice() {
+            if (state.phase !== 'waiting') return;
+            state.roll = Math.floor(Math.random() * 6) + 1;
+            state.moves = state.roll;
+            state.rolls++;
+            state.phase = 'moving';
+            if (state.turnTimer === 'on') startTurnTimer();
+            updateStats();
+            drawBoard();
+            const info = state.mode === 'tutorial' ? 'tutorial-info' : 'game-info';
+            document.getElementById(info).textContent = `Rolled a ${state.roll}! Use arrow keys or WASD to move`;
+            if (state.mode === 'tutorial' && tutorialStep === 1) advanceTutorial();
+        }
+
+        function startTurnTimer() {
+            const timePerTurn = 30;
+            let timeLeft = timePerTurn;
+            document.getElementById('game-info').textContent += ` | Time left: ${timeLeft}s`;
+            turnTimer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(turnTimer);
+                    state.phase = 'lose';
+                    showPrompt('Time’s up!');
+                } else {
+                    document.getElementById('game-info').textContent = `Moves: ${state.moves}. Use arrow keys or WASD to move | Time left: ${timeLeft}s`;
+                }
+            }, 1000);
+        }
+
+        function replayLevel() {
+            document.getElementById('prompt').style.display = 'none';
+            turnCount = 0;
+            initBoard();
+            updateStats();
+            drawBoard();
+            displayModeRules();
+        }
+
+        function nextLevel() {
+            document.getElementById('prompt').style.display = 'none';
+            state.levels++;
+            turnCount = 0;
+            if (state.level >= 100) {
+                showSection('fugitive-menu');
+                document.getElementById('level-info').textContent = 'You won all levels! Pick a new one';
+            } else {
+                state.level++;
+                document.getElementById('level').value = state.level;
+                initBoard();
+                updateStats();
+                drawBoard();
+                displayModeRules();
+            }
+        }
+
+        function resetLevel() {
+            turnCount = 0;
+            initBoard();
+            updateStats();
+            drawBoard();
+            displayModeRules();
+        }
+
+        function restartLevel() {
+            if (state.initial) {
+                state.king = [...state.initial.king];
+                state.jail = [...state.initial.jail];
+                state.escape = [...state.initial.escape];
+                state.opponents = JSON.parse(JSON.stringify(state.initial.opponents));
+                state.blocked = JSON.parse(JSON.stringify(state.initial.blocked));
+                state.treasures = JSON.parse(JSON.stringify(state.initial.treasures));
+                state.pointItems = JSON.parse(JSON.stringify(state.initial.pointItems));
+                state.collectedTreasures = [];
+                state.roll = 0;
+                state.moves = 0;
+                state.phase = 'waiting';
+                turnCount = 0;
+                drawBoard();
+                const info = state.mode === 'tutorial' ? 'tutorial-info' : 'game-info';
+                document.getElementById(info).textContent = 'Press Space to roll dice';
+                updateStats();
+                displayModeRules();
+            }
+        }
+
+        function initializeStandardBoard() {
+            const board = standardState.board;
+            // Clear board
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    board[row][col] = null;
+                }
+            }
+            // Pawns
+            for (let col = 0; col < 8; col++) {
+                board[1][col] = { type: 'pawn', color: 'white' };
+                board[6][col] = { type: 'pawn', color: 'black' };
+            }
+            // Rooks
+            board[0][0] = board[0][7] = { type: 'rook', color: 'white' };
+            board[7][0] = board[7][7] = { type: 'rook', color: 'black' };
+            // Knights
+            board[0][1] = board[0][6] = { type: 'knight', color: 'white' };
+            board[7][1] = board[7][6] = { type: 'knight', color: 'black' };
+            // Bishops
+            board[0][2] = board[0][5] = { type: 'bishop', color: 'white' };
+            board[7][2] = board[7][5] = { type: 'bishop', color: 'black' };
+            // Queens
+            board[0][3] = { type: 'queen', color: 'white' };
+            board[7][3] = { type: 'queen', color: 'black' };
+            // Kings
+            board[0][4] = { type: 'king', color: 'white' };
+            board[7][4] = { type: 'king', color: 'black' };
+
+            standardState.turn = 'white';
+            standardState.selected = null;
+            standardState.validMoves = [];
+            standardState.castling = { white: { king: true, kingRook: true, queenRook: true }, black: { king: true, kingRook: true, queenRook: true } };
+            standardState.enPassant = null;
+            standardState.whiteTime = 600;
+            standardState.blackTime = 600;
+        }
+
+        function initBoard() {
+            const currentCtx = state.mode === 'tutorial' ? tutorialCtx : ctx;
+            if (!currentCtx) return;
+            state.level = Math.max(1, Math.min(state.level, 100));
+            state.opponents = [];
+            state.blocked = [];
+            state.treasures = [];
+            state.collectedTreasures = [];
+            state.roll = 0;
+            state.moves = 0;
+            state.phase = 'waiting';
+            const occupied = [];
+            const levelData = levels[state.level - 1] || { pawns: 3, rooks: 0, knights: 0, bishops: 0, queen: 0 };
+
+            state.jail = getRandomSquare(occupied) || [0, 0];
+            occupied.push(state.jail);
+            state.king = [...state.jail];
+            let attempts = 0;
+            do {
+                state.escape = getRandomSquare(occupied) || [7, 7];
+                attempts++;
+                if (attempts > 50) {
+                    state.escape = [state.jail[0] > 3 ? 0 : 7, state.jail[1] > 3 ? 0 : 7];
+                    break;
+                }
+            } while (manhattanDistance(state.jail, state.escape) < 7);
+            occupied.push(state.escape);
+
+            const blockCount = blocks[state.difficulty] || 8;
+            for (let i = 0; i < blockCount; i++) {
+                const pos = getRandomSquare(occupied) || [0, 0];
+                state.blocked.push(pos);
+                occupied.push(pos);
+            }
+
+            if (state.guardsEnabled === 'on') {
+                const opponentTypes = [];
+                for (let i = 0; i < (levelData.pawns || 0); i++) opponentTypes.push('pawn');
+                for (let i = 0; i < (levelData.rooks || 0); i++) opponentTypes.push('rook');
+                for (let i = 0; i < (levelData.knights || 0); i++) opponentTypes.push('knight');
+                for (let i = 0; i < (levelData.bishops || 0); i++) opponentTypes.push('bishop');
+                for (let i = 0; i < (levelData.queen || 0); i++) opponentTypes.push('queen');
+                for (const type of opponentTypes) {
+                    const pos = getRandomSquare(occupied) || [0, 0];
+                    state.opponents.push({ type, pos });
+                    occupied.push(pos);
+                }
+            }
+
+            if (state.treasureDrops === 'on') {
+                const treasureKeys = Object.keys(treasures);
+                for (let i = 0; i < 3; i++) {
+                    const treasureType = treasureKeys[Math.floor(Math.random() * treasureKeys.length)];
+                    const pos = getRandomSquare(occupied) || [0, 0];
+                    state.treasures.push({ type: treasureType, pos });
+                    occupied.push(pos);
+                }
+            }
+            if (state.arcadeMode === 'on') {
+                const pointTypes = ['①', '⑤', '⑩'];
+                for (let i = 0; i < 3; i++) {
+                    const type = pointTypes[Math.floor(Math.random() * pointTypes.length)];
+                    const pos = getRandomSquare(occupied) || [0, 0];
+                    state.pointItems.push({ type, pos });
+                    occupied.push(pos);
+                }
+            }
+
+            state.portalsList = [];
+            for (let i = 0; i < state.portals; i++) {
+                const portal1 = getRandomSquare(occupied) || [0, 0];
+                occupied.push(portal1);
+                const portal2 = getRandomSquare(occupied) || [0, 0];
+                occupied.push(portal2);
+                state.portalsList.push([portal1, portal2]);
+            }
+
+            state.initial = {
+                king: [...state.king],
+                jail: [...state.jail],
+                escape: [...state.escape],
+                opponents: JSON.parse(JSON.stringify(state.opponents)),
+                blocked: JSON.parse(JSON.stringify(state.blocked)),
+                treasures: JSON.parse(JSON.stringify(state.treasures)),
+                portalsList: JSON.parse(JSON.stringify(state.portalsList)),
+                pointItems: JSON.parse(JSON.stringify(state.pointItems))
+            };
+
+            drawBoard();
+            const info = state.mode === 'tutorial' ? 'tutorial-info' : 'game-info';
+            document.getElementById(info).textContent = 'Press Space to roll dice';
+            updateStats();
+            displayModeRules();
+        }
+
+        function getValidMoves() {
+            const moves = [];
+            const directions = [[0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [-1, -1], [1, -1], [-1, 1]];
+            const [kingRow, kingCol] = state.king;
+            for (const [dr, dc] of directions) {
+                const row = kingRow + dr;
+                const col = kingCol + dc;
+                if (row >= 0 && row < BOARD && col >= 0 && col < BOARD &&
+                    !state.blocked.some(b => b[0] === row && b[1] === col)) {
+                    if (state.kingDisarmed === 'on' && state.opponents.some(op => op.pos[0] === row && op.pos[1] === col)) continue;
+                    moves.push([row, col]);
+                }
+            }
+            return moves;
+        }
+
+        function getGuardVision(guard) {
+            const vision = [];
+            const [row, col] = guard.pos;
+
+            function addVisionInDirection(dr, dc) {
+                let r = row + dr;
+                let c = col + dc;
+                while (r >= 0 && r < BOARD && c >= 0 && c < BOARD) {
+                    if (state.blocked.some(b => b[0] === r && b[1] === c)) break;
+                    vision.push([r, c]);
+                    r += dr;
+                    c += dc;
+                }
+            }
+
+            switch (guard.type) {
+                case 'pawn':
+                    [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(([dr, dc]) => {
+                        const r = row + dr;
+                        const c = col + dc;
+                        if (r >= 0 && r < BOARD && c >= 0 && c < BOARD &&
+                            !state.blocked.some(b => b[0] === r && b[1] === c)) vision.push([r, c]);
+                    });
+                    break;
+                case 'rook':
+                    addVisionInDirection(-1, 0);
+                    addVisionInDirection(1, 0);
+                    addVisionInDirection(0, -1);
+                    addVisionInDirection(0, 1);
+                    break;
+                case 'knight':
+                    [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => {
+                        const r = row + dr;
+                        const c = col + dc;
+                        if (r >= 0 && r < BOARD && c >= 0 && c < BOARD &&
+                            !state.blocked.some(b => b[0] === r && b[1] === c)) vision.push([r, c]);
+                    });
+                    break;
+                case 'bishop':
+                    addVisionInDirection(-1, -1);
+                    addVisionInDirection(-1, 1);
+                    addVisionInDirection(1, -1);
+                    addVisionInDirection(1, 1);
+                    break;
+                case 'queen':
+                    addVisionInDirection(-1, 0);
+                    addVisionInDirection(1, 0);
+                    addVisionInDirection(0, -1);
+                    addVisionInDirection(0, 1);
+                    addVisionInDirection(-1, -1);
+                    addVisionInDirection(-1, 1);
+                    addVisionInDirection(1, -1);
+                    addVisionInDirection(1, 1);
+                    break;
+            }
+            return vision;
+        }
+
+        function getKingVision() {
+            const vision = [];
+            const [kingRow, kingCol] = state.king;
+            for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                    const r = kingRow + dr;
+                    const c = kingCol + dc;
+                    if (r >= 0 && r < BOARD && c >= 0 && c < BOARD) vision.push([r, c]);
+                }
+            }
+            return vision;
+        }
+
+        function checkGuards() {
+            if (state.guardsEnabled === 'off' || state.phase === 'win') return;
+            state.opponents.forEach(op => {
+                const vision = getGuardVision(op);
+                if (vision.some(([r, c]) => r === state.king[0] && c === state.king[1])) {
+                    state.phase = 'lose';
+                    showPrompt('A guard caught you!');
+                }
+            });
+        }
+
+        function enemyTurn() {
+            if (state.guardsEnabled === 'off') return;
+            state.opponents.forEach(guard => moveGuard(guard));
+            drawBoard();
+        }
+
+        function moveGuard(guard) {
+            const difficultyFactor = { 'pawn': 1, 'knight': 2, 'rook': 3, 'bishop': 4, 'queen': 5, 'king': 6 }[state.difficulty];
+            const levelFactor = Math.min(state.level / 20, 5);
+            const aggression = Math.min(difficultyFactor * 0.2 + levelFactor * 0.1, 1);
+            const [kingRow, kingCol] = state.king;
+            const [row, col] = guard.pos;
+            let newPos = [...guard.pos];
+
+            const roamingChance = 1 - aggression;
+            const shouldRoam = Math.random() < roamingChance;
+
+            if (shouldRoam) {
+                const directions = [[0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [-1, -1], [1, -1], [-1, 1]];
+                const validMoves = directions.map(([dr, dc]) => {
+                    const r = row + dr, c = col + dc;
+                    return (r >= 0 && r < BOARD && c >= 0 && c < BOARD &&
+                            !state.blocked.some(b => b[0] === r && b[1] === c) &&
+                            !state.opponents.some(o => o.pos[0] === r && o.pos[1] === c && o !== guard)) ? [r, c] : null;
+                }).filter(m => m);
+                if (validMoves.length > 0) newPos = validMoves[Math.floor(Math.random() * validMoves.length)];
+            } else {
+                switch (guard.type) {
+                    case 'pawn':
+                    case 'bishop':
+                        newPos = [[-1, -1], [-1, 1], [1, -1], [1, 1]].reduce((best, [dr, dc]) => {
+                            const r = row + dr, c = col + dc;
+                            if (r >= 0 && r < BOARD && c >= 0 && c < BOARD &&
+                                !state.blocked.some(b => b[0] === r && b[1] === c) &&
+                                !state.opponents.some(o => o.pos[0] === r && o.pos[1] === c && o !== guard)) {
+                                const dist = manhattanDistance([r, c], state.king);
+                                const bestDist = manhattanDistance(best, state.king);
+                                return dist < bestDist ? [r, c] : best;
+                            }
+                            return best;
+                        }, guard.pos);
+                        break;
+                    case 'rook':
+                        const straightMoves = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+                        newPos = straightMoves.reduce((best, [dr, dc]) => {
+                            const r = row + dr, c = col + dc;
+                            if (r >= 0 && r < BOARD && c >= 0 && c < BOARD &&
+                                !state.blocked.some(b => b[0] === r && b[1] === c) &&
+                                !state.opponents.some(o => o.pos[0] === r && o.pos[1] === c && o !== guard)) {
+                                const dist = manhattanDistance([r, c], state.king);
+                                const bestDist = manhattanDistance(best, state.king);
+                                return dist < bestDist ? [r, c] : best;
+                            }
+                            return best;
+                        }, guard.pos);
+                        break;
+                    case 'knight':
+                        const knightMoves = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]];
+                        newPos = knightMoves.reduce((best, [dr, dc]) => {
+                            const r = row + dr, c = col + dc;
+                            if (r >= 0 && r < BOARD && c >= 0 && c < BOARD &&
+                                !state.blocked.some(b => b[0] === r && b[1] === c) &&
+                                !state.opponents.some(o => o.pos[0] === r && o.pos[1] === c && o !== guard)) {
+                                const dist = manhattanDistance([r, c], state.king);
+                                const bestDist = manhattanDistance(best, state.king);
+                                return dist < bestDist ? [r, c] : best;
+                            }
+                            return best;
+                        }, guard.pos);
+                        break;
+                    case 'queen':
+                        const allMoves = [[0, 1], [1, 0], [0, -1], [-1, 0], [-1, -1], [-1, 1], [1, -1], [1, 1]];
+                        newPos = allMoves.reduce((best, [dr, dc]) => {
+                            const r = row + dr, c = col + dc;
+                            if (r >= 0 && r < BOARD && c >= 0 && c < BOARD &&
+                                !state.blocked.some(b => b[0] === r && b[1] === c) &&
+                                !state.opponents.some(o => o.pos[0] === r && o.pos[1] === c && o !== guard)) {
+                                const dist = manhattanDistance([r, c], state.king);
+                                const bestDist = manhattanDistance(best, state.king);
+                                return dist < bestDist ? [r, c] : best;
+                            }
+                            return best;
+                        }, guard.pos);
+                        break;
+                }
+            }
+
+            if (difficultyFactor >= 4 && state.opponents.length > 1 && Math.random() < aggression) {
+                const closestGuard = state.opponents.reduce((closest, other) => {
+                    if (other === guard) return closest;
+                    const dist = manhattanDistance(guard.pos, other.pos);
+                    return dist < manhattanDistance(guard.pos, closest.pos) ? other : closest;
+                }, state.opponents[0]);
+                const midPoint = [
+                    Math.floor((guard.pos[0] + closestGuard.pos[0]) / 2),
+                    Math.floor((guard.pos[1] + closestGuard.pos[1]) / 2)
+                ];
+                const distToMid = manhattanDistance(guard.pos, midPoint);
+                if (distToMid > 0 && !state.blocked.some(b => b[0] === midPoint[0] && b[1] === midPoint[1])) {
+                    newPos = midPoint;
+                }
+            }
+
+            guard.pos = newPos;
+            if (state.portals > 0) {
+                const linked = getLinkedPortal(newPos);
+                if (linked) guard.pos = linked;
+            }
+        }
+
+        function moveKing(row, col) {
+            let target = [row, col];
+            if (state.portals > 0) {
+                const linked = getLinkedPortal(target);
+                if (linked) target = linked;
+            }
+            const opponentIndex = state.opponents.findIndex(op => op.pos[0] === target[0] && op.pos[1] === target[1]);
+            if (opponentIndex !== -1 && state.kingDisarmed === 'off') {
+                state.opponents.splice(opponentIndex, 1);
+                state.guards++;
+                if (state.arcadeMode === 'on') state.score += 10;
+                state.king = target;
+                state.moves--;
+                if (state.king[0] === state.escape[0] && state.king[1] === state.escape[1]) {
+                    state.phase = 'win';
+                    showPrompt('You reached the safe spot!');
+                } else {
+                    checkGuards();
+                    if (state.phase !== 'lose') {
+                        if (state.moves > 0) {
+                            const info = state.mode === 'tutorial' ? 'tutorial-info' : 'game-info';
+                            document.getElementById(info).textContent = `Moves: ${state.moves}. Use arrow keys or WASD to move`;
+                        } else {
+                            endPlayerTurn();
+                        }
+                    }
+                }
+            } else if (opponentIndex === -1) {
+                state.king = target;
+                const treasureIndex = state.treasures.findIndex(t => t.pos[0] === target[0] && t.pos[1] === target[1]);
+                if (treasureIndex !== -1) {
+                    const treasure = state.treasures[treasureIndex];
+                    state.collectedTreasures.push(treasure);
+                    state.treasures.splice(treasureIndex, 1);
+                    alert(`Collected ${treasure.type}: ${treasures[treasure.type].description}`);
+                    if (state.mode === 'tutorial' && tutorialSteps[tutorialStep].trigger === 'collect') advanceTutorial();
+                }
+                if (state.arcadeMode === 'on') {
+                    const pointItemIndex = state.pointItems.findIndex(item => item.pos[0] === target[0] && item.pos[1] === target[1]);
+                    if (pointItemIndex !== -1) {
+                        const item = state.pointItems[pointItemIndex];
+                        state.score += points[item.type];
+                        state.pointItems.splice(pointItemIndex, 1);
+                        alert(`Collected ${item.type}: +${points[item.type]} points`);
+                    }
+                }
+                if (state.king[0] === state.escape[0] && state.king[1] === state.escape[1]) {
+                    state.phase = 'win';
+                    showPrompt('You reached the safe spot!');
+                    if (state.mode === 'tutorial' && tutorialSteps[tutorialStep].trigger === 'win') advanceTutorial();
+                } else {
+                    state.moves--;
+                    checkGuards();
+                    if (state.phase !== 'lose') {
+                        if (state.moves > 0) {
+                            const info = state.mode === 'tutorial' ? 'tutorial-info' : 'game-info';
+                            document.getElementById(info).textContent = `Moves: ${state.moves}. Use arrow keys or WASD to move`;
+                            if (state.mode === 'tutorial' && tutorialSteps[tutorialStep].trigger === 'move') advanceTutorial();
+                        } else {
+                            endPlayerTurn();
+                        }
+                    }
+                }
+            }
+            updateStats();
+            drawBoard();
+        }
+
+        function endPlayerTurn() {
+            clearInterval(turnTimer);
+            state.phase = 'waiting';
+            turnCount++;
+            if (state.turnLimit !== 'none' && turnCount >= parseInt(state.turnLimit)) {
+                state.phase = 'lose';
+                showPrompt('Turn limit reached!');
+                return;
+            }
+            if (state.guardsEnabled === 'on') enemyTurn();
+            checkGuards();
+            if (state.phase !== 'lose') {
+                const info = state.mode === 'tutorial' ? 'tutorial-info' : 'game-info';
+                document.getElementById(info).textContent = 'Press Space to roll dice';
+            }
+            updateStats();
+        }
+
+        function resetStandardChess() {
+            initializeStandardBoard();
+            standardState.turn = 'white';
+            standardState.selected = null;
+            standardState.validMoves = [];
+            standardState.whiteTime = 600;
+            standardState.blackTime = 600;
+            standardState.cursorRow = 0; // Add this
+            standardState.cursorCol = 0; // Add this
+            if (standardState.turnTimer === 'on') {
+                startStandardTimer();
+            }
+            drawStandardBoard();
+            updateStandardInfo();
+        }
+
+        function updateStats() {
+            let statsText = `Difficulty: ${state.difficulty.charAt(0).toUpperCase() + state.difficulty.slice(1)} | Rolls: ${state.rolls} | Moves: ${state.moves} | Guards: ${state.guards} | Levels: ${state.levels}`;
+            if (state.turnLimit !== 'none') statsText += ` | Turns Left: ${parseInt(state.turnLimit) - turnCount}`;
+            if (state.arcadeMode === 'on') statsText += ` | Score: ${state.score}`;
+            document.getElementById('stats').textContent = statsText;
+        }
+
+        function showPrompt(content) {
+            clearInterval(turnTimer);
+            document.getElementById('prompt-text').textContent = content;
+            document.getElementById('btn-replay').style.display = 'inline';
+            document.getElementById('btn-next-level').style.display = 'inline';
+            document.getElementById('btn-back-to-menu').style.display = 'none';
+            document.getElementById('prompt').style.display = 'block';
+        }
+
+        function displayModeRules() {
+            let rules = 'Escape from the jail (red) to the safe spot (green)';
+            if (state.guardsEnabled === 'on') rules += ' while avoiding guards';
+            if (state.turnTimer === 'on') rules += '. Turn Timer: 30s per turn';
+            if (state.turnLimit !== 'none') rules += `. Turn Limit: ${state.turnLimit} turns`;
+            if (state.kingDisarmed === 'on') rules += '. King Disarmed: Cannot attack';
+            if (state.treasureDrops === 'on') rules += '. Treasures: Collect for abilities';
+            if (state.hiddenItems === 'on') rules += '. Hidden Items: Treasures are invisible';
+            if (state.heroAbility === 'on' && state.hero) rules += `. Hero Ability: ${heroes[state.hero].description}`;
+            rules += '.';
+            document.getElementById('mode-instructions').textContent = rules;
+        }
+
+        // --- Drawing Functions ---
+        function gameLoop() {
+            if (isDirty) {
+                if (state.mode === 'creative') {
+                    drawCreativeBoard();
+                } else if (state.mode === 'tutorial') {
+                    drawBoard();
+                } else if (state.mode === 'standard') {
+                    drawStandardBoard();
+                } else {
+                    drawBoard();
+                }
+                isDirty = false;
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        function drawBoard() {
+            const currentCtx = state.mode === 'tutorial' ? tutorialCtx : ctx;
+            if (!currentCtx) {
+                console.error('Canvas context is null for mode:', state.mode);
+                return;
+            }
+            console.log(`Drawing board for mode: ${state.mode} on ${state.mode === 'tutorial' ? '#tutorial-board' : '#board'}`);
+            const theme = themes[state.theme] || themes.light;
+            const pieceStyle = pieceStyles[state.pieceStyle] || pieceStyles.classic;
+            currentCtx.clearRect(0, 0, BOARD * SQUARE, BOARD * SQUARE);
+
+            let visionSet = new Set();
+            if (state.fogVision === 'on') {
+                const vision = getKingVision();
+                vision.forEach(([r, c]) => visionSet.add(`${r},${c}`));
+            }
+
+            // Draw the checkerboard pattern
+            for (let row = 0; row < BOARD; row++) {
+                for (let col = 0; col < BOARD; col++) {
+                    if (state.fogVision === 'off' || visionSet.has(`${row},${col}`)) {
+                        currentCtx.fillStyle = (row + col) % 2 === 0 ? theme.light : theme.dark;
+                        currentCtx.fillRect(col * SQUARE, row * SQUARE, SQUARE, SQUARE);
+                    }
+                }
+            }
+
+            // Draw portals
+                if (state.portals === 'on') {
+                    state.portalsList.forEach(pair => {
+                        pair.forEach(([row, col]) => {
+                            if (state.fogVision === 'off' || visionSet.has(`${row},${col}`)) {
+                                currentCtx.fillStyle = '#800080';
+                                currentCtx.fillRect(col * SQUARE, row * SQUARE, SQUARE, SQUARE);
+                            }
+                        });
+                    });
+                }
+                // Apply fog of war
+                if (state.fogVision === 'on') {
+                    for (let row = 0; row < BOARD; row++) {
+                        for (let col = 0; col < BOARD; col++) {
+                            if (!visionSet.has(`${row},${col}`)) {
+                                currentCtx.fillStyle = '#808080';
+                                currentCtx.fillRect(col * SQUARE, row * SQUARE, SQUARE, SQUARE);
+                            }
+                        }
+                    }
+                }
+                // Draw blocked squares
+                state.blocked.forEach(([row, col]) => {
+                    if (state.fogVision === 'off' || visionSet.has(`${row},${col}`)) {
+                        if (row >= 0 && row < BOARD && col >= 0 && col < BOARD) {
+                            currentCtx.fillStyle = '#000';
+                            currentCtx.fillRect(col * SQUARE, row * SQUARE, SQUARE, SQUARE);
+                            currentCtx.strokeStyle = '#333';
+                            currentCtx.strokeRect(col * SQUARE, row * SQUARE, SQUARE, SQUARE);
+                        }
+                    }
+                });
+                // Draw jail and escape points
+                if (state.fogVision === 'off' || visionSet.has(`${state.jail[0]},${state.jail[1]}`)) {
+                    if (state.jail[0] >= 0 && state.jail[0] < BOARD && state.jail[1] >= 0 && state.jail[1] < BOARD) {
+                        currentCtx.fillStyle = '#f00';
+                        currentCtx.fillRect(state.jail[1] * SQUARE, state.jail[0] * SQUARE, SQUARE, SQUARE);
+                    }
+                }
+                if (state.fogVision === 'off' || visionSet.has(`${state.escape[0]},${state.escape[1]}`)) {
+                    if (state.escape[0] >= 0 && state.escape[0] < BOARD && state.escape[1] >= 0 && state.escape[1] < BOARD) {
+                        currentCtx.fillStyle = '#0f0';
+                        currentCtx.fillRect(state.escape[1] * SQUARE, state.escape[0] * SQUARE, SQUARE, SQUARE);
+                    }
+                }
+                // Highlight valid moves
+                if (state.phase === 'moving') {
+                    getValidMoves().forEach(([row, col]) => {
+                        if (row >= 0 && row < BOARD && col >= 0 && col < BOARD) {
+                            currentCtx.fillStyle = 'rgba(0, 0, 255, 0.5)';
+                            currentCtx.fillRect(col * SQUARE, row * SQUARE, SQUARE, SQUARE);
+                        }
+                    });
+                }
+                // Highlight guard vision
+                if (window.hoveredGuard?.pos && state.guardsEnabled === 'on') {
+                    getGuardVision(window.hoveredGuard).forEach(([row, col]) => {
+                        if (row >= 0 && row < BOARD && col >= 0 && col < BOARD &&
+                            (state.fogVision === 'off' || visionSet.has(`${row},${col}`))) {
+                            currentCtx.fillStyle = 'rgba(255, 255, 0, 0.5)';
+                            currentCtx.fillRect(col * SQUARE, row * SQUARE, SQUARE, SQUARE);
+                        }
+                    });
+                }
+                // Draw treasures
+                state.treasures.forEach(t => {
+                    if ((state.fogVision === 'off' || visionSet.has(`${t.pos[0]},${t.pos[1]}`)) &&
+                        state.hiddenItems === 'off') {
+                        currentCtx.font = `24px ${theme.font}`;
+                        currentCtx.fillStyle = '#FFD700';
+                        currentCtx.textAlign = 'center';
+                        currentCtx.textBaseline = 'middle';
+                        currentCtx.fillText(treasures[t.type].symbol, t.pos[1] * SQUARE + SQUARE / 2, t.pos[0] * SQUARE + SQUARE / 2);
+                    }
+                });
+                // Draw point items
+                state.pointItems.forEach(item => {
+                    if ((state.fogVision === 'off' || visionSet.has(`${item.pos[0]},${item.pos[1]}`)) &&
+                        state.hiddenItems === 'off') {
+                        currentCtx.font = `24px ${theme.font}`;
+                        currentCtx.fillStyle = '#FFD700';
+                        currentCtx.textAlign = 'center';
+                        currentCtx.textBaseline = 'middle';
+                        currentCtx.fillText(item.type, item.pos[1] * SQUARE + SQUARE / 2, item.pos[0] * SQUARE + SQUARE / 2);
+                    }
+                });
+                // Draw opponents
+                state.opponents.forEach(op => {
+                    if (op.pos[0] >= 0 && op.pos[0] < BOARD && op.pos[1] >= 0 && op.pos[1] < BOARD) {
+                        if (state.fogVision === 'off' || visionSet.has(`${op.pos[0]},${op.pos[1]}`)) {
+                            currentCtx.font = `28px ${theme.font}`;
+                            if (state.pieceStyle === 'minimalist') currentCtx.font = `24px ${theme.font}`;
+                            currentCtx.fillStyle = theme.btn;
+                            currentCtx.textAlign = 'center';
+                            currentCtx.textBaseline = 'middle';
+                            const symbol = pieceStyle[op.type] || pieceStyle.pawn;
+                            currentCtx.fillText(symbol, op.pos[1] * SQUARE + SQUARE / 2, op.pos[0] * SQUARE + SQUARE / 2);
+                        }
+                    }
+                });
+                // Draw king or hero
+                if (state.king[0] >= 0 && state.king[0] < BOARD && state.king[1] >= 0 && state.king[1] < BOARD) {
+                    currentCtx.font = `36px ${theme.font}`;
+                    if (state.pieceStyle === 'minimalist') currentCtx.font = `30px ${theme.font}`;
+                    currentCtx.fillStyle = theme.dark;
+                    currentCtx.textAlign = 'center';
+                    currentCtx.textBaseline = 'middle';
+                    const symbol = state.hero ? heroes[state.hero].emoji : pieceStyle.king;
+                    currentCtx.fillText(symbol, state.king[1] * SQUARE + SQUARE / 2, state.king[0] * SQUARE + SQUARE / 2);
+                }
+            }
+
+        function applyTheme() {
+            const theme = themes[state.theme] || themes.light;
+            document.body.style.background = theme.bg;
+            document.body.style.color = theme.text;
+            document.body.style.fontFamily = theme.font;
+            document.querySelectorAll('button').forEach(btn => {
+                btn.style.background = theme.btn;
+                btn.style.color = theme.text;
+                btn.style.fontFamily = theme.font;
+                btn.onmouseover = () => btn.style.background = theme.btnHover;
+                btn.onmouseout = () => btn.style.background = theme.btn;
+            });
+            document.querySelectorAll('#music-controls button').forEach(btn => {
+                btn.style.background = theme.btn;
+                btn.style.color = 'white';
+                btn.style.border = '1px solid #333';
+                btn.onmouseover = () => btn.style.background = theme.btnHover;
+                btn.onmouseout = () => btn.style.background = theme.btn;
+            });
+            document.querySelectorAll('h1, h2, h3, #level-info, #game-info, #stats, #track-info, #mode-instructions').forEach(el => {
+                el.style.color = theme.text;
+            });
+        }
+
+        function setRandomTheme() {
+            const randColor = () => `#${Math.floor(Math.random() * 16777216).toString(16).padStart(6, '0')}`;
+            state.theme = 'random';
+            themes.random = {
+                light: randColor(),
+                dark: randColor(),
+                bg: `linear-gradient(45deg, ${randColor()}, ${randColor()})`,
+                btn: randColor(),
+                btnHover: randColor(),
+                text: randColor(),
+                font: Object.values(themes)[Math.floor(Math.random() * (Object.keys(themes).length - 1))].font
+            };
+            document.getElementById('theme').value = 'random';
+            document.getElementById('standard-theme').value = 'random'; // Update both dropdowns
+            applyTheme();
+            if (document.getElementById('game-area').style.display === 'flex') {
+                drawBoard();
+            } else if (state.mode === 'standard') {
+                drawStandardBoard();
+                isDirty = true;
+            }
+        }
+
+        // --- Music Control Functions ---
+        function toggleMute() {
+            state.music.isMuted = !state.music.isMuted;
+            state.music.audio.muted = state.music.isMuted;
+            document.getElementById('btn-mute').textContent = state.music.isMuted ? 'Unmute' : 'Mute';
+        }
+
+        function togglePause() {
+            if (state.music.isPlaying) {
+                state.music.audio.pause();
+                state.music.isPlaying = false;
+                document.getElementById('btn-pause').textContent = 'Play';
+            } else {
+                playMusic();
+            }
+        }
+
+        function playMusic() {
+            const track = state.music.playlist[state.music.currentTrack];
+            state.music.audio.src = track.url;
+            state.music.audio.play().then(() => {
+                state.music.isPlaying = true;
+                document.getElementById('btn-pause').textContent = 'Pause';
+                document.getElementById('track-info').textContent = `Now Playing: ${getSongDisplayName(track)}`;
+            }).catch(console.error);
+        }
+
+        function skipTrack() {
+            state.music.currentTrack = (state.music.currentTrack + 1) % state.music.playlist.length;
+            document.getElementById('song-select').value = state.music.currentTrack;
+            playMusic();
+        }
+
+        function shufflePlaylist() {
+            const playlist = state.music.playlist;
+            for (let i = playlist.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [playlist[i], playlist[j]] = [playlist[j], playlist[i]];
+            }
+            state.music.currentTrack = 0;
+            document.getElementById('song-select').innerHTML = '';
+            initSongSelect();
+            playMusic();
+        }
+
+        function toggleRepeat() {
+            state.music.isRepeating = !state.music.isRepeating;
+            document.getElementById('btn-repeat').style.background =
+                state.music.isRepeating ? '#ff4444' : themes[state.theme].btn;
+        }
+
+        // --- Tutorial Logic ---
+        let tutorialStep = 0;
+        const tutorialSteps = [
+            {
+                message: "Welcome to Fugitive Chess! Your goal is to move the King from the jail (red) to the safe spot (green). Press Space to roll the dice.",
+                board: { king: [0, 0], jail: [0, 0], escape: [2, 2], opponents: [], blocked: [], treasures: [], portalsList: [] }
+            },
+            {
+                message: "You rolled the dice! Use arrow keys or WASD to move one square at a time. Try moving right.",
+                board: null,
+                trigger: 'move'
+            },
+            {
+                message: "Good! Now, guards (like this Pawn) can catch you if you're in their vision. Move down to avoid it.",
+                board: { opponents: [{ type: 'pawn', pos: [0, 2] }] },
+                trigger: 'move'
+            },
+            {
+                message: "Treasures give special abilities. Move to collect this one (diamond = reroll).",
+                board: { treasures: [{ type: 'diamond', pos: [2, 1] }] },
+                trigger: 'collect'
+            },
+            {
+                message: "Portals teleport you! Move to the purple square to jump to its pair.",
+                board: { portalsList: [[[2, 0], [1, 1]]] },
+                trigger: 'move'
+            },
+            {
+                message: "Reach the safe spot (green) to win! Move there now.",
+                board: null,
+                trigger: 'win'
+            }
+        ];
+
+        // --- Tutorial Logic ---
+        function startTutorial() {
+            state.mode = 'tutorial';
+            tutorialStep = 0;
+            showSection('tutorial-section');
+            console.log('Starting tutorial');
+            setupTutorialStep();
+        }
+
+        function setupTutorialStep() {
+            console.log('Setting up tutorial step', tutorialStep);
+            const step = tutorialSteps[tutorialStep];
+            if (step.board) {
+                state.king = step.board.king || state.king;
+                state.jail = step.board.jail || state.jail;
+                state.escape = step.board.escape || state.escape;
+                state.opponents = step.board.opponents || [];
+                state.blocked = step.board.blocked || [];
+                state.treasures = step.board.treasures || [];
+                state.portalsList = step.board.portalsList || [];
+                state.portals = state.portalsList.length > 0 ? 'on' : 'off';
+            }
+            state.phase = 'waiting';
+            state.moves = 0;
+            state.roll = 0;
+            document.getElementById('tutorial-info').textContent = step.message;
+            isDirty = true; // Trigger redraw
+        }
+
+        function setupTutorialStep() {
+            const step = tutorialSteps[tutorialStep];
+            if (step.board) {
+                state.king = step.board.king || state.king;
+                state.jail = step.board.jail || state.jail;
+                state.escape = step.board.escape || state.escape;
+                state.opponents = step.board.opponents || [];
+                state.blocked = step.board.blocked || [];
+                state.treasures = step.board.treasures || [];
+                state.portalsList = step.board.portalsList || [];
+                state.portals = state.portalsList.length > 0 ? 'on' : 'off';
+            }
+            state.phase = 'waiting';
+            state.moves = 0;
+            state.roll = 0;
+            document.getElementById('game-info').textContent = step.message;
+            drawBoard();
+        }
+
+        function advanceTutorial() {
+            const step = tutorialSteps[tutorialStep];
+            if (tutorialStep >= tutorialSteps.length - 1 && step.trigger === 'win') {
+                showPrompt("Tutorial complete! Start playing or explore Creative Mode.");
+                return;
+            }
+            tutorialStep++;
+            setupTutorialStep();
+        }
+
+        // --- Creative Mode ---
+        const creativeState = {
+            king: null,
+            jail: null,
+            escape: null,
+            opponents: [],
+            blocked: [],
+            treasures: [],
+            portalsList: [],
+            placing: null
+        };
+
+        // --- Creative Mode ---
+        function startCreativeMode() {
+            state.mode = 'creative';
+            showSection('creative-mode');
+            requestAnimationFrame(() => {
+                const canvas = document.getElementById('creative-board');
+                if (!canvas) {
+                    console.error('Creative canvas not found after RAF');
+                    return;
+                }
+                if (!creativeCtx) {
+                    creativeCtx = canvas.getContext('2d');
+                    if (!creativeCtx) {
+                        console.error('Failed to initialize creative canvas context');
+                        return;
+                    }
+                }
+                console.log('Creative canvas context obtained');
+                resetCreativeState();
+                setupCreativeEvents();
+                isDirty = true; // Trigger redraw
+            });
+        }
+
+        function resetCreativeState() {
+            creativeState.king = null;
+            creativeState.jail = null;
+            creativeState.escape = null;
+            creativeState.opponents = [];
+            creativeState.blocked = [];
+            creativeState.treasures = [];
+            creativeState.portalsList = [];
+            creativeState.placing = null;
+        }
+
+        function setupCreativeEvents() {
+            const canvas = document.getElementById('creative-board');
+            if (!canvas) {
+                console.error('Creative canvas not found in setupCreativeEvents');
+                return;
+            }
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const col = Math.floor((e.clientX - rect.left) / SQUARE);
+                const row = Math.floor((e.clientY - rect.top) / SQUARE);
+                const pos = [row, col];
+                if (creativeState.placing) {
+                    switch (creativeState.placing) {
+                        case 'king': creativeState.king = pos; break;
+                        case 'jail': creativeState.jail = pos; break;
+                        case 'escape': creativeState.escape = pos; break;
+                        case 'guard':
+                            const guardType = document.getElementById('guard-type').value;
+                            creativeState.opponents.push({ type: guardType, pos });
+                            break;
+                        case 'block': creativeState.blocked.push(pos); break;
+                        case 'treasure':
+                            const treasureType = document.getElementById('treasure-type').value;
+                            creativeState.treasures.push({ type: treasureType, pos });
+                            break;
+                        case 'portal':
+                            if (creativeState.portalsList.length && creativeState.portalsList[creativeState.portalsList.length - 1].length === 1) {
+                                creativeState.portalsList[creativeState.portalsList.length - 1].push(pos);
+                            } else {
+                                creativeState.portalsList.push([pos]);
+                            }
+                            break;
+                        case 'remove':
+                            if (creativeState.king && creativeState.king[0] === row && creativeState.king[1] === col) creativeState.king = null;
+                            else if (creativeState.jail && creativeState.jail[0] === row && creativeState.jail[1] === col) creativeState.jail = null;
+                            else if (creativeState.escape && creativeState.escape[0] === row && creativeState.escape[1] === col) creativeState.escape = null;
+                            else {
+                                creativeState.opponents = creativeState.opponents.filter(op => op.pos[0] !== row || op.pos[1] !== col);
+                                creativeState.blocked = creativeState.blocked.filter(b => b[0] !== row || b[1] !== col);
+                                creativeState.treasures = creativeState.treasures.filter(t => t.pos[0] !== row || t.pos[1] !== col);
+                                creativeState.portalsList = creativeState.portalsList.map(pair => pair.filter(p => p[0] !== row || p[1] !== col)).filter(pair => pair.length > 0);
+                            }
+                            break;
+                    }
+                    drawCreativeBoard();
+                }
+            });
+
+            // Re-attach other button event listeners to ensure they work
+            document.getElementById('btn-place-king').addEventListener('click', () => creativeState.placing = 'king');
+            document.getElementById('btn-place-jail').addEventListener('click', () => creativeState.placing = 'jail');
+            document.getElementById('btn-place-escape').addEventListener('click', () => creativeState.placing = 'escape');
+            document.getElementById('btn-place-guard').addEventListener('click', () => creativeState.placing = 'guard');
+            document.getElementById('btn-place-block').addEventListener('click', () => creativeState.placing = 'block');
+            document.getElementById('btn-place-treasure').addEventListener('click', () => creativeState.placing = 'treasure');
+            document.getElementById('btn-place-portal').addEventListener('click', () => creativeState.placing = 'portal');
+            document.getElementById('btn-remove').addEventListener('click', () => creativeState.placing = 'remove');
+            document.getElementById('btn-save-map').addEventListener('click', () => {
+                localStorage.setItem('fugitiveCreativeMap', JSON.stringify(creativeState));
+                alert('Map saved!');
+            });
+            document.getElementById('btn-load-map').addEventListener('click', () => {
+                const saved = localStorage.getItem('fugitiveCreativeMap');
+                if (saved) {
+                    Object.assign(creativeState, JSON.parse(saved));
+                    drawCreativeBoard();
+                    alert('Map loaded!');
+                }
+            });
+            document.getElementById('btn-play-creative').addEventListener('click', () => {
+                if (creativeState.king && creativeState.jail && creativeState.escape) {
+                    state.king = [...creativeState.king];
+                    state.jail = [...creativeState.jail];
+                    state.escape = [...creativeState.escape];
+                    state.opponents = JSON.parse(JSON.stringify(creativeState.opponents));
+                    state.blocked = JSON.parse(JSON.stringify(creativeState.blocked));
+                    state.treasures = JSON.parse(JSON.stringify(creativeState.treasures));
+                    state.portalsList = JSON.parse(JSON.stringify(creativeState.portalsList));
+                    state.portals = state.portalsList.length > 0 ? 'on' : 'off';
+                    state.mode = 'fugitive';
+                    document.getElementById('creative-mode').style.display = 'none';
+                    document.getElementById('game-area').style.display = 'flex';
+                    initBoard();
+                    drawBoard();
+                    displayModeRules();
+                } else {
+                    alert('Please place King, Jail, and Escape before playing.');
+                }
+            });
+        }
+
+        function drawCreativeBoard() {
+            if (!creativeCtx) {
+                console.error('Creative canvas context is null');
+                return;
+            }
+            console.log('Drawing creative board on #creative-board');
+            const theme = themes[state.theme] || themes.light;
+            const pieceStyle = pieceStyles[state.pieceStyle] || pieceStyles.classic;
+            creativeCtx.clearRect(0, 0, BOARD * SQUARE, BOARD * SQUARE);
+            for (let row = 0; row < BOARD; row++) {
+                for (let col = 0; col < BOARD; col++) {
+                    creativeCtx.fillStyle = (row + col) % 2 === 0 ? theme.light : theme.dark;
+                    creativeCtx.fillRect(col * SQUARE, row * SQUARE, SQUARE, SQUARE);
+                }
+            }
+            creativeState.blocked.forEach(([row, col]) => {
+                creativeCtx.fillStyle = '#000';
+                creativeCtx.fillRect(col * SQUARE, row * SQUARE, SQUARE, SQUARE);
+            });
+            if (creativeState.jail) {
+                creativeCtx.fillStyle = '#f00';
+                creativeCtx.fillRect(creativeState.jail[1] * SQUARE, creativeState.jail[0] * SQUARE, SQUARE, SQUARE);
+            }
+            if (creativeState.escape) {
+                creativeCtx.fillStyle = '#0f0';
+                creativeCtx.fillRect(creativeState.escape[1] * SQUARE, creativeState.escape[0] * SQUARE, SQUARE, SQUARE);
+            }
+            creativeState.treasures.forEach(t => {
+                creativeCtx.font = `24px ${theme.font}`;
+                creativeCtx.fillStyle = '#FFD700';
+                creativeCtx.textAlign = 'center';
+                creativeCtx.textBaseline = 'middle';
+                creativeCtx.fillText(treasures[t.type].symbol, t.pos[1] * SQUARE + SQUARE / 2, t.pos[0] * SQUARE + SQUARE / 2);
+            });
+            creativeState.opponents.forEach(op => {
+                creativeCtx.font = `28px ${theme.font}`;
+                creativeCtx.fillStyle = theme.btn;
+                creativeCtx.textAlign = 'center';
+                creativeCtx.textBaseline = 'middle';
+                creativeCtx.fillText(pieceStyle[op.type], op.pos[1] * SQUARE + SQUARE / 2, op.pos[0] * SQUARE + SQUARE / 2);
+            });
+            creativeState.portalsList.forEach(pair => {
+                pair.forEach(([row, col]) => {
+                    creativeCtx.fillStyle = '#800080';
+                    creativeCtx.fillRect(col * SQUARE, row * SQUARE, SQUARE, SQUARE);
+                });
+            });
+            if (creativeState.king) {
+                creativeCtx.font = `36px ${theme.font}`;
+                creativeCtx.fillStyle = theme.dark;
+                creativeCtx.textAlign = 'center';
+                creativeCtx.textBaseline = 'middle';
+                creativeCtx.fillText(pieceStyle.king, creativeState.king[1] * SQUARE + SQUARE / 2, creativeState.king[0] * SQUARE + SQUARE / 2);
+            }
+        }
+
+        function startStandardChess() {
+            state.mode = 'standard';
+            standardState.difficulty = document.getElementById('standard-difficulty').value;
+            standardState.theme = document.getElementById('standard-theme').value;
+            standardState.pieceStyle = document.getElementById('standard-piece-style').value;
+            standardState.turnTimer = document.getElementById('standard-turn-timer').value;
+            standardState.hero = document.getElementById('standard-hero-select').value !== '-1' ? document.getElementById('standard-hero-select').value : null; // Add this
+            standardState.aiPlaysAs = standardState.difficulty !== 'none' ? 'black' : null;
+            initializeStandardBoard();
+            showSection('standard-chess-section');
+            setTimeout(() => {
+                drawStandardBoard();
+                isDirty = true;
+                if (standardState.aiPlaysAs === 'white') {
+                    setTimeout(makeAIMove, 500);
+                }
+            }, 100);
+            if (standardState.turnTimer === 'on') startStandardTimer();
+        }
+
+        function startStandardTimer() {
+            clearInterval(standardState.timer);
+            standardState.timer = setInterval(() => {
+                if (standardState.turn === 'white') {
+                    standardState.whiteTime--;
+                    if (standardState.whiteTime <= 0) endStandardGame('Black wins by time!');
+                } else {
+                    standardState.blackTime--;
+                    if (standardState.blackTime <= 0) endStandardGame('White wins by time!');
+                }
+                updateStandardInfo();
+            }, 1000);
+        }
+
+        function updateStandardInfo() {
+            const whiteMin = Math.floor(standardState.whiteTime / 60);
+            const whiteSec = standardState.whiteTime % 60;
+            const blackMin = Math.floor(standardState.blackTime / 60);
+            const blackSec = standardState.blackTime % 60;
+            document.getElementById('standard-game-info').textContent = `${standardState.turn === 'white' ? 'White' : 'Black'} to move | White: ${whiteMin}:${whiteSec < 10 ? '0' : ''}${whiteSec} | Black: ${blackMin}:${blackSec < 10 ? '0' : ''}${blackSec}`;
+        }
+
+        function initStandardCanvasEvents() {
+            const canvas = document.getElementById('standard-chess-board');
+            canvas.addEventListener('click', (e) => {
+                if (state.mode !== 'standard') return;
+                const rect = canvas.getBoundingClientRect();
+                const col = Math.floor((e.clientX - rect.left) / SQUARE);
+                const row = Math.floor((e.clientY - rect.top) / SQUARE);
+                handleStandardClick(row, col);
+            });
+        }
+
+        function handleStandardClick(row, col) {
+            const piece = standardState.board[row][col];
+            if (standardState.selected) {
+                if (standardState.validMoves.some(([r, c]) => r === row && c === col)) {
+                    moveStandardPiece(standardState.selected, [row, col]);
+                    standardState.selected = null;
+                    standardState.validMoves = [];
+                    drawStandardBoard();
+                    const opponentColor = getOpponentColor(standardState.turn);
+                    if (isCheckmate(opponentColor)) {
+                        endStandardGame(`${standardState.turn} wins by checkmate!`);
+                    } else if (isStalemate(opponentColor)) {
+                        endStandardGame('Draw by stalemate!');
+                    } else {
+                        standardState.turn = opponentColor;
+                        updateStandardInfo();
+                        if (standardState.aiPlaysAs === standardState.turn) {
+                            setTimeout(makeAIMove, 500);
+                        }
+                    }
+                } else {
+                    standardState.selected = null;
+                    standardState.validMoves = [];
+                    drawStandardBoard();
+                }
+            } else if (piece && piece.color === standardState.turn) {
+                standardState.selected = [row, col];
+                standardState.validMoves = getStandardValidMoves(piece, row, col);
+                drawStandardBoard();
+            }
+        }
+
+        function handleStandardKeyboardSelect() {
+            const row = standardState.cursorRow;
+            const col = standardState.cursorCol;
+            const piece = standardState.board[row][col];
+            if (standardState.selected) {
+                if (standardState.validMoves.some(([r, c]) => r === row && c === col)) {
+                    moveStandardPiece(standardState.selected, [row, col]);
+                    standardState.selected = null;
+                    standardState.validMoves = [];
+                    drawStandardBoard();
+                    const opponentColor = getOpponentColor(standardState.turn);
+                    if (isCheckmate(opponentColor)) {
+                        endStandardGame(`${standardState.turn} wins by checkmate!`);
+                    } else if (isStalemate(opponentColor)) {
+                        endStandardGame('Draw by stalemate!');
+                    } else {
+                        standardState.turn = opponentColor;
+                        updateStandardInfo();
+                        if (standardState.aiPlaysAs === standardState.turn) {
+                            setTimeout(makeAIMove, 500);
+                        }
+                    }
+                } else {
+                    standardState.selected = null;
+                    standardState.validMoves = [];
+                    drawStandardBoard();
+                }
+            } else if (piece && piece.color === standardState.turn) {
+                standardState.selected = [row, col];
+                standardState.validMoves = getStandardValidMoves(piece, row, col);
+                drawStandardBoard();
+            }
+        }
+
+        function getStandardValidMoves(piece, row, col) {
+            const moves = [];
+            const direction = piece.color === 'white' ? 1 : -1; // Corrected direction
+            switch (piece.type) {
+                case 'pawn':
+                    if (isStandardEmpty(row + direction, col)) {
+                        moves.push([row + direction, col]);
+                        if ((piece.color === 'white' && row === 1) || (piece.color === 'black' && row === 6)) { // Corrected initial rows
+                            if (isStandardEmpty(row + 2 * direction, col)) moves.push([row + 2 * direction, col]);
+                        }
+                    }
+                    if (isStandardOpponent(row + direction, col - 1, piece.color)) moves.push([row + direction, col - 1]);
+                    if (isStandardOpponent(row + direction, col + 1, piece.color)) moves.push([row + direction, col + 1]);
+                    if (standardState.enPassant && standardState.enPassant[0] === row + direction && Math.abs(standardState.enPassant[1] - col) === 1) {
+                        moves.push([row + direction, standardState.enPassant[1]]);
+                    }
+                    break;
+                case 'rook':
+                    addLinearMoves(moves, row, col, [0, 1]);
+                    addLinearMoves(moves, row, col, [0, -1]);
+                    addLinearMoves(moves, row, col, [1, 0]);
+                    addLinearMoves(moves, row, col, [-1, 0]);
+                    break;
+                case 'knight':
+                    const knightMoves = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]];
+                    knightMoves.forEach(([dr, dc]) => {
+                        const r = row + dr, c = col + dc;
+                        if (isStandardValidSquare(r, c) && (!standardState.board[r][c] || standardState.board[r][c].color !== piece.color)) {
+                            moves.push([r, c]);
+                        }
+                    });
+                    break;
+                case 'bishop':
+                    addLinearMoves(moves, row, col, [1, 1]);
+                    addLinearMoves(moves, row, col, [1, -1]);
+                    addLinearMoves(moves, row, col, [-1, 1]);
+                    addLinearMoves(moves, row, col, [-1, -1]);
+                    break;
+                case 'queen':
+                    addLinearMoves(moves, row, col, [0, 1]);
+                    addLinearMoves(moves, row, col, [0, -1]);
+                    addLinearMoves(moves, row, col, [1, 0]);
+                    addLinearMoves(moves, row, col, [-1, 0]);
+                    addLinearMoves(moves, row, col, [1, 1]);
+                    addLinearMoves(moves, row, col, [1, -1]);
+                    addLinearMoves(moves, row, col, [-1, 1]);
+                    addLinearMoves(moves, row, col, [-1, -1]);
+                    break;
+                case 'king':
+                    const kingMoves = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+                    kingMoves.forEach(([dr, dc]) => {
+                        const r = row + dr, c = col + dc;
+                        if (isStandardValidSquare(r, c) && (!standardState.board[r][c] || standardState.board[r][c].color !== piece.color)) {
+                            moves.push([r, c]);
+                        }
+                    });
+                    // Castling
+                    if (standardState.castling[piece.color].king) {
+                        const opponentColor = getOpponentColor(piece.color);
+                        if (standardState.castling[piece.color].kingRook && 
+                            isStandardEmpty(row, 5) && isStandardEmpty(row, 6) && 
+                            !isKingInCheck(piece.color) && 
+                            !isSquareUnderAttack(row, 5, opponentColor) && 
+                            !isSquareUnderAttack(row, 6, opponentColor)) {
+                            moves.push([row, 6]); // King-side
+                        }
+                        if (standardState.castling[piece.color].queenRook && 
+                            isStandardEmpty(row, 3) && isStandardEmpty(row, 2) && isStandardEmpty(row, 1) && 
+                            !isKingInCheck(piece.color) && 
+                            !isSquareUnderAttack(row, 3, opponentColor) && 
+                            !isSquareUnderAttack(row, 2, opponentColor)) {
+                            moves.push([row, 2]); // Queen-side
+                        }
+                    }
+                    break;
+            }
+            const validMoves = moves.filter(move => !wouldPutKingInCheck([row, col], move));
+            console.log(`Moves for ${piece.type} at [${row},${col}]:`, moves, 'Valid:', validMoves);
+            return validMoves;
+        }
+
+        function wouldPutKingInCheck(from, to) {
+            const [fromRow, fromCol] = from;
+            const [toRow, toCol] = to;
+            const piece = standardState.board[fromRow][fromCol];
+            const capturedPiece = standardState.board[toRow][toCol];
+            const newBoard = copyBoard(standardState.board);
+
+            newBoard[toRow][toCol] = piece;
+            newBoard[fromRow][fromCol] = null;
+
+            const opponentColor = piece.color === 'white' ? 'black' : 'white';
+            const kingPos = getKingPosition(piece.color, newBoard);
+            return isSquareUnderAttack(kingPos[0], kingPos[1], opponentColor, newBoard);
+        }
+
+        function copyBoard(board) {
+            return board.map(row => row.slice());
+        }
+
+        function isCheckmate(color) {
+            if (!isKingInCheck(color)) return false;
+            const moves = getAllLegalMoves(color);
+            return moves.length === 0;
+        }
+        
+        function isStalemate(color) {
+            if (isKingInCheck(color)) return false;
+            const moves = getAllLegalMoves(color);
+            return moves.length === 0;
+        }
+
+        function addLinearMoves(moves, row, col, [dr, dc]) {
+            let r = row + dr, c = col + dc;
+            while (isStandardValidSquare(r, c)) {
+                if (!standardState.board[r][c]) moves.push([r, c]);
+                else {
+                    if (standardState.board[r][c].color !== standardState.board[row][col].color) moves.push([r, c]);
+                    break;
+                }
+                r += dr;
+                c += dc;
+            }
+        }
+
+        function moveStandardPiece(from, to) {
+            const [fromRow, fromCol] = from;
+            const [toRow, toCol] = to;
+            const piece = standardState.board[fromRow][fromCol];
+            standardState.enPassant = null;
+
+            if (piece.type === 'pawn') {
+                if ((piece.color === 'white' && toRow === 7) || (piece.color === 'black' && toRow === 0)) {
+                    piece.type = 'queen'; // Automatic promotion to queen
+                }
+                if (Math.abs(fromRow - toRow) === 2) {
+                    standardState.enPassant = [(fromRow + toRow) / 2, fromCol];
+                }
+            }
+            if (piece.type === 'pawn' && toRow === standardState.enPassant?.[0] && toCol === standardState.enPassant?.[1]) {
+                standardState.board[fromRow][toCol] = null; // Capture en passant
+            }
+            if (piece.type === 'king' && Math.abs(fromCol - toCol) === 2) {
+                if (toCol === 6) {
+                    standardState.board[fromRow][5] = standardState.board[fromRow][7];
+                    standardState.board[fromRow][7] = null;
+                } else if (toCol === 2) {
+                    standardState.board[fromRow][3] = standardState.board[fromRow][0];
+                    standardState.board[fromRow][0] = null;
+                }
+            }
+
+            standardState.board[toRow][toCol] = piece;
+            standardState.board[fromRow][fromCol] = null;
+
+            if (piece.type === 'king') standardState.castling[piece.color].king = false;
+            if (piece.type === 'rook') {
+                if (fromCol === 0) standardState.castling[piece.color].queenRook = false;
+                if (fromCol === 7) standardState.castling[piece.color].kingRook = false;
+            }
+        }
+
+        function isStandardValidSquare(row, col) {
+            return row >= 0 && row < 8 && col >= 0 && col < 8;
+        }
+
+        function isStandardEmpty(row, col) {
+            return isStandardValidSquare(row, col) && !standardState.board[row][col];
+        }
+
+        function isStandardOpponent(row, col, color) {
+            return isStandardValidSquare(row, col) && standardState.board[row][col] && standardState.board[row][col].color !== color;
+        }
+
+        function drawStandardBoard() {
+            if (!standardChessCtx) {
+                console.error('standardChessCtx is null');
+                return;
+            }
+            console.log('Drawing Standard Chess board');
+            const theme = themes[standardState.theme] || themes.light;
+            const pieceStyle = pieceStyles[standardState.pieceStyle] || pieceStyles.classic;
+
+            standardChessCtx.clearRect(0, 0, 400, 400);
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    standardChessCtx.fillStyle = (row + col) % 2 === 0 ? theme.light : theme.dark;
+                    standardChessCtx.fillRect(col * SQUARE, row * SQUARE, SQUARE, SQUARE);
+                }
+            }
+
+            // Draw cursor (Insert here)
+            standardChessCtx.fillStyle = 'rgba(255, 255, 0, 0.5)'; // Yellow for cursor
+            standardChessCtx.fillRect(standardState.cursorCol * SQUARE, standardState.cursorRow * SQUARE, SQUARE, SQUARE);
+
+            if (standardState.selected) {
+                const [row, col] = standardState.selected;
+                standardChessCtx.fillStyle = 'rgba(0, 255, 0, 0.5)';
+                standardChessCtx.fillRect(col * SQUARE, row * SQUARE, SQUARE, SQUARE);
+                standardState.validMoves.forEach(([r, c]) => {
+                    standardChessCtx.fillStyle = 'rgba(0, 0, 255, 0.5)';
+                    standardChessCtx.fillRect(c * SQUARE, r * SQUARE, SQUARE, SQUARE);
+                });
+            }
+
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const piece = standardState.board[row][col];
+                    if (piece) {
+                        standardChessCtx.font = `28px ${theme.font}`;
+                        standardChessCtx.fillStyle = piece.color === 'white' ? '#fff' : '#000';
+                        standardChessCtx.shadowColor = 'black';
+                        standardChessCtx.shadowBlur = 2;
+                        standardChessCtx.textAlign = 'center';
+                        standardChessCtx.textBaseline = 'middle';
+                        const symbol = piece.type === 'king' && standardState.hero ? heroes[standardState.hero].emoji : pieceStyle[piece.type];
+                        standardChessCtx.fillText(symbol, col * SQUARE + SQUARE / 2, row * SQUARE + SQUARE / 2);
+                        standardChessCtx.shadowBlur = 0;
+                    }
+                }
+            }
+            updateStandardInfo();
+        }
+
+        function endStandardGame(message) {
+            clearInterval(standardState.timer);
+            document.getElementById('prompt-text').textContent = message;
+            document.getElementById('btn-replay').style.display = 'inline';
+            document.getElementById('btn-next-level').style.display = 'none';
+            document.getElementById('btn-back-to-menu').style.display = 'inline';
+            document.getElementById('prompt').style.display = 'block';
+            document.getElementById('btn-replay').onclick = () => startStandardChess();
+            document.getElementById('btn-back-to-menu').onclick = () => showSection('start-page');
+        }
+
+        function getKingPosition(color, board = standardState.board) {
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const piece = board[row][col];
+                    if (piece && piece.type === 'king' && piece.color === color) {
+                        return [row, col];
+                    }
+                }
+            }
+            return null; // Should not happen in a valid game
+        }
+
+        function isKingInCheck(color, board = standardState.board) {
+            const kingPos = getKingPosition(color, board);
+            const opponentColor = color === 'white' ? 'black' : 'white';
+            return isSquareUnderAttack(kingPos[0], kingPos[1], opponentColor, board);
+        }
+
+        function isSquareUnderAttack(row, col, attackerColor, board = standardState.board) {
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const piece = board[r][c];
+                    if (piece && piece.color === attackerColor) {
+                        if (canPieceAttack(piece, r, c, row, col, board)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        function canPieceAttack(piece, row, col, targetRow, targetCol, board = standardState.board) {
+            if (row === targetRow && col === targetCol) return false;
+            switch (piece.type) {
+                case 'pawn':
+                    const direction = piece.color === 'white' ? 1 : -1;
+                    return (row + direction === targetRow) && (Math.abs(col - targetCol) === 1);
+                case 'knight':
+                    const dr = Math.abs(row - targetRow);
+                    const dc = Math.abs(col - targetCol);
+                    return (dr === 2 && dc === 1) || (dr === 1 && dc === 2);
+                case 'bishop':
+                    return isSameDiagonal(row, col, targetRow, targetCol) && isPathClear(row, col, targetRow, targetCol, board);
+                case 'rook':
+                    return (isSameRow(row, targetRow) || isSameCol(col, targetCol)) && isPathClear(row, col, targetRow, targetCol, board);
+                case 'queen':
+                    return (isSameRow(row, targetRow) || isSameCol(col, targetCol) || isSameDiagonal(row, col, targetRow, targetCol)) && 
+                          isPathClear(row, col, targetRow, targetCol, board);
+                case 'king':
+                    return Math.abs(row - targetRow) <= 1 && Math.abs(col - targetCol) <= 1;
+            }
+            return false;
+        }
+
+        function isSameRow(r1, r2) { return r1 === r2; }
+        function isSameCol(c1, c2) { return c1 === c2; }
+        function isSameDiagonal(r1, c1, r2, c2) { return Math.abs(r1 - r2) === Math.abs(c1 - c2); }
+
+        function isPathClear(fromRow, fromCol, toRow, toCol, board = standardState.board) {
+            if (fromRow === toRow) {
+                const minCol = Math.min(fromCol, toCol) + 1;
+                const maxCol = Math.max(fromCol, toCol) - 1;
+                for (let c = minCol; c <= maxCol; c++) {
+                    if (board[fromRow][c]) return false;
+                }
+            } else if (fromCol === toCol) {
+                const minRow = Math.min(fromRow, toRow) + 1;
+                const maxRow = Math.max(fromRow, toRow) - 1;
+                for (let r = minRow; r <= maxRow; r++) {
+                    if (board[r][fromCol]) return false;
+                }
+            } else if (isSameDiagonal(fromRow, fromCol, toRow, toCol)) {
+                const rowStep = fromRow < toRow ? 1 : -1;
+                const colStep = fromCol < toCol ? 1 : -1;
+                let r = fromRow + rowStep;
+                let c = fromCol + colStep;
+                while (r !== toRow && c !== toCol) {
+                    if (board[r][c]) return false;
+                    r += rowStep;
+                    c += colStep;
+                }
+            }
+            return true;
+        }
+
+        function getAllLegalMoves(color) {
+            const moves = [];
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const piece = standardState.board[row][col];
+                    if (piece && piece.color === color) {
+                        const pieceMoves = getStandardValidMoves(piece, row, col);
+                        pieceMoves.forEach(([toRow, toCol]) => {
+                            moves.push([row, col, toRow, toCol]);
+                        });
+                    }
+                }
+            }
+            return moves;
+        }
+
+        function makeAIMove() {
+            const color = standardState.turn;
+            console.log('AI turn:', color);
+            const moves = getAllLegalMoves(color);
+            console.log('Legal moves found:', moves.length, moves);
+            if (moves.length === 0) {
+                console.error('No legal moves for AI - possible bug in move validation');
+                return;
+            }
+
+            let selectedMove;
+            const capturingMoves = moves.filter(([fr, fc, tr, tc]) => 
+                standardState.board[tr][tc] && standardState.board[tr][tc].color !== color);
+            
+            if (capturingMoves.length > 0) {
+                let bestValue = -1;
+                let bestMoves = [];
+                capturingMoves.forEach(move => {
+                    const [fr, fc, tr, tc] = move;
+                    const capturedPiece = standardState.board[tr][tc];
+                    const value = pieceValues[capturedPiece.type];
+                    if (value > bestValue) {
+                        bestValue = value;
+                        bestMoves = [move];
+                    } else if (value === bestValue) {
+                        bestMoves.push(move);
+                    }
+                });
+                const randomIndex = Math.floor(Math.random() * bestMoves.length);
+                selectedMove = bestMoves[randomIndex];
+            } else {
+                const randomIndex = Math.floor(Math.random() * moves.length);
+                selectedMove = moves[randomIndex];
+            }
+
+            const [fromRow, fromCol, toRow, toCol] = selectedMove;
+            try {
+                moveStandardPiece([fromRow, fromCol], [toRow, toCol]);
+                drawStandardBoard();
+                const opponentColor = getOpponentColor(color);
+                if (isCheckmate(opponentColor)) {
+                    endStandardGame(`${color} wins by checkmate!`);
+                } else if (isStalemate(opponentColor)) {
+                    endStandardGame('Draw by stalemate!');
+                } else {
+                    standardState.turn = opponentColor;
+                    updateStandardInfo();
+                    if (standardState.aiPlaysAs === standardState.turn) {
+                        setTimeout(makeAIMove, 500);
+                    }
+                }
+            } catch (error) {
+                console.error('Error in AI move execution:', error);
+            }
+        }
+
+        function getOpponentColor(color) {
+            return color === 'white' ? 'black' : 'white';
+        }
+
+        function saveGame() {
+            const saveData = {
+                state: { ...state },
+                creativeState: { ...creativeState }
+            };
+            localStorage.setItem('fugitiveChessSave', JSON.stringify(saveData));
+            alert('Game saved!');
+        }
+
+        function saveCurrentTheme() {
+            if (state.theme && themes[state.theme]) {
+                const name = prompt('Enter a name for this theme:');
+                if (name) {
+                    const themeData = themes[state.theme];
+                    const customThemes = JSON.parse(localStorage.getItem('fugitiveCustomThemes')) || {};
+                    customThemes[name] = themeData;
+                    localStorage.setItem('fugitiveCustomThemes', JSON.stringify(customThemes));
+                    themes[`custom:${name}`] = themeData;
+                    alert('Theme saved!');
+                    initThemeDropdown();
+                    initStandardDropdowns(); // Refresh both dropdowns
+                }
+            } else {
+                alert('No theme to save.');
+            }
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('fugitiveChessSave');
+            if (saved) {
+                const data = JSON.parse(saved);
+                Object.assign(state, data.state);
+                Object.assign(creativeState, data.creativeState);
+                applyTheme();
+                drawBoard();
+                alert('Game loaded!');
+            } else {
+                alert('No saved game found.');
+            }
+        }
+
+        // --- Event Listeners ---
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('DOMContentLoaded', initializeGame);
+    </script>
+</body>
+</html>
